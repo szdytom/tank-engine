@@ -1,5 +1,5 @@
-import Tank from '../../shared/tank/tanks';
-import Config from '../../shared/tank/config';
+import Tank from '../shared/tanks';
+import Config from '../shared/config';
 import 'socket.io-client';
 
 let socket: SocketIOClient.Socket;

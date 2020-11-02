@@ -1,6 +1,6 @@
-import Bullet from "../../shared/tank/bullet";
-import Config from "../../shared/tank/config";
-import Tank from "../../shared/tank/tanks";
+import Bullet from "../shared/bullet";
+import Config from "../shared/config";
+import Tank from "../shared/tanks";
 
 export default function (tanks: Tank[], bullets: Bullet[], socket) {
     const canvas = <HTMLCanvasElement>document.getElementById('space');

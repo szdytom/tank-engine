@@ -2,10 +2,10 @@ import SocketIO = require('socket.io');
 import Express = require('express');
 import http_server = require('http');
 import path = require('path');
-import Config from '../../shared/tank/config';
-import Position from '../../shared/tank/positions';
-import Tank from '../../shared/tank/tanks';
-import Bullet from '../../shared/tank/bullet';
+import Config from '../shared/config';
+import Position from '../shared/positions';
+import Tank from '../shared/tanks';
+import Bullet from '../shared/bullet';
 
 function get_random_position(): Position {
     let x = (Math.random() * 10000) % Config.space.width;

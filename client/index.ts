@@ -1,9 +1,9 @@
 import $ = require('jquery');
 import io = require('socket.io-client');
-import Tank from '../../shared/tank/tanks';
-import Bullet from '../../shared/tank/bullet';
+import Tank from '../shared/tanks';
+import Bullet from '../shared/bullet';
 import ui from './ui';
-import Config from '../../shared/tank/config';
+import Config from '../shared/config';
 import { start_code, update_tanks } from './api';
 
 let socket: SocketIOClient.Socket;
