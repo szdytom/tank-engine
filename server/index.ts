@@ -72,10 +72,12 @@ function check_crash_bullet(bullet: Bullet) {
 }
 
 function check_outof_space(pos: Position) {
-    if (pos.x < 0
-        || pos.y < 0
-        || pos.x > Config.space.width
-        || pos.y > Config.space.height) {
+    let half_tank_size = Config.tanks.size / 2;
+
+    if (pos.x < half_tank_size
+        || pos.y < half_tank_size
+        || pos.x > Config.space.width - half_tank_size
+        || pos.y > Config.space.height - half_tank_size) {
         return true;
     }
     return false;
@@ -161,7 +163,7 @@ io.on('connection', (socket: SocketIO.Socket) => {
     });
 
     socket.on('fire', (level: number) => {
-        if (!this_tank.can_safe_fire || typeof(level) !== "number" || level > 4 || level < 0) {
+        if (!this_tank.can_safe_fire || typeof (level) !== "number" || level > 4 || level < 0) {
             this_tank.blood -= Config.tanks.fire_too_much_damage;
             return;
         }
@@ -189,7 +191,7 @@ setInterval(() => {
     }
 
     for (let id in tanks) {
-        let this_tank = tanks[id];
+        let this_tank: Tank = tanks[id];
         if (this_tank.blood <= 0) {
             let this_socket: SocketIO.Socket = socket_list[this_tank.id];
             this_socket.disconnect();
@@ -207,11 +209,14 @@ setInterval(() => {
         if (check_outof_space(this_tank.pos)) {
             this_tank.blood -= Config.tanks.crash_damage;
 
-            this_tank.pos.x = Math.min(Config.space.width, this_tank.pos.x);
-            this_tank.pos.y = Math.min(Config.space.width, this_tank.pos.y);
+            let half_tank_size = Config.tanks.size / 2;
+            this_tank.pos.x = Math.min(Config.space.width - half_tank_size, this_tank.pos.x);
+            this_tank.pos.y = Math.min(Config.space.width - half_tank_size, this_tank.pos.y);
 
-            this_tank.pos.x = Math.max(0, this_tank.pos.x);
-            this_tank.pos.y = Math.max(0, this_tank.pos.y);
+            this_tank.pos.x = Math.max(half_tank_size, this_tank.pos.x);
+            this_tank.pos.y = Math.max(half_tank_size, this_tank.pos.y);
+
+            this_tank.is_moving = false;
         }
     }
 
