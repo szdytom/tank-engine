@@ -161,7 +161,7 @@ io.on('connection', (socket: SocketIO.Socket) => {
     });
 
     socket.on('fire', (level: number) => {
-        if (!this_tank.can_safe_fire) {
+        if (!this_tank.can_safe_fire || typeof(level) !== "number" || level > 4 || level < 0) {
             this_tank.blood -= Config.tanks.fire_too_much_damage;
             return;
         }
@@ -218,5 +218,5 @@ setInterval(() => {
     io.emit("update", { tanks: tanks, bullets: bullets });
 }, Config.game.update);
 
-app.use('/client', Express.static(path.resolve(__dirname + '../../../client/WS-tank')));
+app.use('/', Express.static(path.join(__dirname + '../../../../client/')));
 http.listen(3000, () => { console.log("Server started on Port 3000."); });

@@ -11,7 +11,11 @@ export default function (tanks: Tank[], bullets: Bullet[], socket) {
     ctx.fillStyle = "brown";
     for (let id in bullets) {
         let this_bullet = bullets[id];
-        ctx.fillRect(this_bullet.pos.x, this_bullet.pos.y, 5, 5);
+        if (this_bullet.level > 0) {
+            ctx.fillRect(this_bullet.pos.x, this_bullet.pos.y, 5, 5);
+        } else {
+            ctx.strokeRect(this_bullet.pos.x, this_bullet.pos.y, 5, 5);
+        }
     }
 
     for (let id in tanks) {
