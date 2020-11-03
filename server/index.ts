@@ -211,8 +211,7 @@ setInterval(() => {
             continue;
         }
 
-        this_tank.pos.x += Config.tanks.max_speed * Math.cos(covert_degree(this_tank.tank_dire));
-        this_tank.pos.y += Config.tanks.max_speed * Math.sin(covert_degree(this_tank.tank_dire));
+        move_position(this_tank.pos, this_tank.tank_dire, Config.tanks.max_speed);
 
         if (check_outof_space(this_tank.pos)) {
             this_tank.blood -= Config.tanks.crash_damage;
