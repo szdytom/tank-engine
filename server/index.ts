@@ -189,7 +189,7 @@ setInterval(() => {
         let this_bullet = bullets[id];
 
         const move_split_time = 5;
-        for (let i = 1; i <= move_split_time) {
+        for (let i = 1; i <= move_split_time; i += 1) {
             move_position(this_bullet.pos, this_bullet.dire, Config.bullet.speed / move_split_time);
             if (check_crash_bullet(this_bullet) || check_outof_space(this_bullet.pos)) {
                 bullets.splice(<number><any>id, 1);
