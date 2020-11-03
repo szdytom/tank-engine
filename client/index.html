@@ -3,26 +3,19 @@
 
 <head>
     <meta http-equiv="Content-Type" content="charset=utf-8">
-    <title>tanks</title>
-    <script src="ace/ace.js" type="text/javascript"></script>
+    <title>Tank Engine</title>
 </head>
 
 <body>
     <main>
-        <canvas height="800px" width="1000px" class="board" id="space"></canvas>
+        <canvas height="800px" width="1000px" id="space"></canvas>
         <div class="control">
-            <textarea id="code"></textarea>
+            <textarea id="code" spellcheck="false" placeholder="Paste your code or code URL here..."></textarea>
             <button class="bottom_button" id="start-button">Start</button>
             <button class="bottom_button" id="stop-button">Stop</button>
         </div>
     </main>
     <div id="message"></div>
-
-    <script>
-        var editor = ace.edit("code");
-        editor.setTheme("ace/theme/tomorrow");
-        editor.session.setMode("ace/mode/javascript");
-    </script>
 
     <style>
         body {
@@ -30,9 +23,9 @@
             margin: 0;
         }
 
-        .board {
+        #space {
             background-color: #ffffff;
-            border-radius: 10px;
+            border-radius: 0;
             margin-top: 20px;
             margin-left: calc((100vw - 1000px) / 2);
             box-shadow: 0 1px 3px rgba(50, 50, 93, .15), 0 1px 0 rgba(0, 0, 0, .02);
@@ -41,7 +34,7 @@
         .control {
             border-radius: 5px;
             margin-top: 20px;
-            margin-bottom: 50px;
+            margin-bottom: 100px;
             margin-left: calc((100vw - 1000px) / 2);
             width: 1000px;
             height: 800px;
@@ -60,11 +53,11 @@
         }
 
         #code {
-            border-top-left-radius: 10px;
-            border-top-right-radius: 10px;
+            font-family: monospace;
+            font-size: larger;
             height: auto;
-            height: 750px;
-            font-size: 16px;
+            height: 100%;
+            width: 100%;
         }
 
         #start-button {
