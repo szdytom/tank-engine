@@ -140,8 +140,8 @@ function start_code(parsed_code: Function, _tanks: Tank[], _socket: SocketIOClie
 
     let this_tank = tanks[socket.id];
     t = new tank(this_tank);
-    let costum_var = {};
-    parsed_code(t, costum_var);
+    let custom_var = {};
+    parsed_code(t, custom_var);
 }
 
 export {

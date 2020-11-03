@@ -4,57 +4,97 @@
 <head>
     <meta http-equiv="Content-Type" content="charset=utf-8">
     <title>tanks</title>
+    <script src="ace/ace.js" type="text/javascript"></script>
 </head>
 
 <body>
     <main>
-        <canvas height="800px" width="1000px" id="space"></canvas>
+        <canvas height="800px" width="1000px" class="board" id="space"></canvas>
         <div class="control">
-            <textarea id="code" placeholder="Paste your code here..."></textarea>
-            <button id="start-button">Start</button>
-            <button id="stop-button">Stop</button>
+            <div id="code"></div>
+            <button class="bottom_button" id="start-button">Start</button>
+            <button class="bottom_button" id="stop-button">Stop</button>
         </div>
     </main>
     <div id="message"></div>
+
+    <script>
+        var editor = ace.edit("code");
+        editor.setTheme("ace/theme/tomorrow");
+        editor.session.setMode("ace/mode/javascript");
+    </script>
+
     <style>
-        #space {
-            border: 1px solid #000000;
+        body {
+            background-color: #f9f9f9;
+            margin: 0;
+        }
+
+        .board {
+            background-color: #ffffff;
+            border-radius: 10px;
+            margin-top: 20px;
+            margin-left: calc((100vw - 1000px) / 2);
+            box-shadow: 0 1px 3px rgba(50, 50, 93, .15), 0 1px 0 rgba(0, 0, 0, .02);
+        }
+
+        .control {
+            border-radius: 5px;
+            margin-top: 20px;
+            margin-bottom: 50px;
+            margin-left: calc((100vw - 1000px) / 2);
+            width: 1000px;
+            height: 800px;
+            box-shadow: 0 1px 3px rgba(50, 50, 93, .15), 0 1px 0 rgba(0, 0, 0, .02);
         }
 
         #message {
-            margin-top: 25px;
-            position: sticky;
+            position: fixed;
             display: flex;
             justify-content: center;
-            background-color: darkslategrey;
-            color: whitesmoke;
+            background-color: #a0a0a0;
+            color: #ffffff;
             bottom: 0;
+            width: 100vw;
+            z-index: 10000;
         }
 
         #code {
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
             height: auto;
-            min-width: 100%;
-            min-height: 750px;
-            overflow: scroll;
+            height: 750px;
+            font-size: 16px;
         }
 
         #start-button {
             float: left;
+            margin-left: 10px;
         }
 
         #stop-button {
             float: right;
+            margin-right: 10px;
         }
 
-        .control {
-            flex: 500px;
-            height: 100%;
+        .bottom_button {
+            margin-top: 10px;
         }
 
-        main {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: stretch;
+        button {
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            background-color: #5bb2ec;
+            color: #fff;
+        }
+
+        button:disabled {
+            background-color: #94c9ec;
+        }
+
+        button:hover {
+            background-color: #3ba5ec;
         }
     </style>
 </body>
