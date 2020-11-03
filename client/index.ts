@@ -14,12 +14,11 @@ function message(x: string) {
 	$("#message").text(x);
 }
 
-function start() {
+function start_by_code(code: string) {
 	$("#stop-button").removeAttr("disabled");
 	$('#start-button').attr("disabled", "true");
 
 	let s: string = '/';
-	let code: string = $('#code').val().toString();
 	let code_loaded: boolean = false;
 	let load_tank_code = new Promise((resolve) => {
 		let iid = setInterval(() => {
@@ -53,6 +52,26 @@ function start() {
 		message('Tank control codes loaded.');
 		start_code(parsed_code, tanks, socket);
 	});
+}
+
+function start() {
+	let code: string = $('#code').val().toString();
+	if (code.startsWith('http')) {
+		// is an URL
+		fetch(code)
+			.then(function (response) {
+				return response.text();
+			})
+			.then(function (remote_code) {
+				message('Remote code downloaded.');
+				start_by_code(remote_code);
+			})
+			.catch(function () {
+				message('Error when downloading the remote code.')
+			});
+	} else {
+		start_by_code(code);
+	}
 }
 
 function stop() {
