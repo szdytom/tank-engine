@@ -1,20 +1,27 @@
-import Bullet from "../shared/bullet";
-import Config from "../shared/config";
-import Tank from "../shared/tanks";
+import {tanks, bullets, socket} from './global';
+import Config from '../shared/config';
 
-export default function (tanks: Tank[], bullets: Bullet[], socket) {
+export default function () {
     const canvas = <HTMLCanvasElement>document.getElementById('space');
     const ctx = canvas.getContext('2d');
-    ctx.fillStyle = "#fff";
-    ctx.fillRect(0, 0, Config.space.width, Config.space.height);
-
+    ctx.clearRect(0, 0, Config.space.width, Config.space.height);
+    
     ctx.fillStyle = "brown";
+    const bullect_draw_size = 5;
     for (let id in bullets) {
         let this_bullet = bullets[id];
         if (this_bullet.level > 0) {
-            ctx.fillRect(this_bullet.pos.x, this_bullet.pos.y, 5, 5);
+            ctx.fillRect(
+                this_bullet.pos.x - bullect_draw_size / 2, 
+                this_bullet.pos.y - bullect_draw_size / 2, 
+                bullect_draw_size, 
+                bullect_draw_size);
         } else {
-            ctx.strokeRect(this_bullet.pos.x, this_bullet.pos.y, 5, 5);
+            ctx.strokeRect(
+                this_bullet.pos.x - bullect_draw_size / 2, 
+                this_bullet.pos.y - bullect_draw_size / 2, 
+                bullect_draw_size, 
+                bullect_draw_size);
         }
     }
 

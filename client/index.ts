@@ -1,14 +1,12 @@
 import $ = require('jquery');
 import io = require('socket.io-client');
-import Tank from '../shared/tanks';
-import Bullet from '../shared/bullet';
 import ui from './ui';
 import Config from '../shared/config';
 import { start_code, update_tanks } from './api';
+import { bullets, set_bullets, set_socket, set_tanks, tanks, socket } from './global';
+import Tank from '../shared/tanks';
+import Bullet from '../shared/bullet';
 
-let socket: SocketIOClient.Socket;
-let tanks: Array<Tank>;
-let bullets: Array<Bullet>;
 
 function message(x: string) {
 	$("#message").text(x);
@@ -18,7 +16,7 @@ function start_by_code(code: string) {
 	$("#stop-button").removeAttr("disabled");
 	$('#start-button').attr("disabled", "true");
 
-	let s: string = '/';
+	let server_url: string = '/';
 	let code_loaded: boolean = false;
 	let load_tank_code = new Promise((resolve) => {
 		let iid = setInterval(() => {
@@ -29,7 +27,7 @@ function start_by_code(code: string) {
 		}, Config.game.update)
 	});
 
-	socket = io(s);
+	set_socket(io(server_url));
 	socket.on('connection', function () {
 		message('Connected');
 	});
@@ -39,18 +37,18 @@ function start_by_code(code: string) {
 		on_stop();
 	});
 
-	socket.on('update', function (info) {
-		tanks = info.tanks;
-		bullets = info.bullets;
-		ui(tanks, bullets, socket);
-		update_tanks(tanks);
+	socket.on('update', function (info: {tanks: Tank[], bullets: Bullet[]}) {
+		set_tanks(info.tanks);
+		set_bullets(info.bullets);
+		ui();
+		update_tanks();
 		code_loaded = true;
 	});
 
 	let parsed_code = new Function('tk', '$', code);
 	load_tank_code.then(() => {
 		message('Tank control codes loaded.');
-		start_code(parsed_code, tanks, socket);
+		start_code(parsed_code);
 	});
 }
 
@@ -89,5 +87,5 @@ $(function () {
 	$('#stop-button').on('click', stop);
 
 	$('#stop-button').attr("disabled", "true");
-	message('Client loaded.');
+	message('Client loaded. [V1.1b1]');
 });

@@ -4,7 +4,7 @@ interface Tank {
     pos: Position,
     blood: number,
     name: string,
-    can_safe_fire: boolean,
+    time_to_fire: number,
     tank_dire: number,
     gun_dire: number,
     radar_dire: number,

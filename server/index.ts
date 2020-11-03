@@ -32,7 +32,7 @@ function create_tank(id: string): Tank {
         pos: get_random_position(),
         blood: 1.0,
         name: "<unnamed> " + id,
-        can_safe_fire: true,
+        time_to_fire: 0,
         tank_dire: dire,
         gun_dire: dire,
         radar_dire: dire,
@@ -168,13 +168,18 @@ io.on('connection', (socket: SocketIO.Socket) => {
     });
 
     socket.on('fire', (level: number) => {
-        if (!this_tank.can_safe_fire || typeof (level) !== "number" || level > 5 || level < 0) {
+        if (this_tank.time_to_fire > 0) {
+            console.log('Fire too much.');
             this_tank.blood -= Config.tanks.fire_too_much_damage;
             return;
         }
 
-        this_tank.can_safe_fire = false;
-        setTimeout(() => { this_tank.can_safe_fire = true; }, Config.tanks.fire_speed[level]);
+        if (typeof level !== 'number' || level > 5 || level < 0) {
+            console.log('Invaild arguments.');
+            return;
+        }
+
+        this_tank.time_to_fire = Config.tanks.fire_speed[level];
         create_bullet(this_tank, level);
     });
 
@@ -200,6 +205,11 @@ setInterval(() => {
 
     for (let id in tanks) {
         let this_tank: Tank = tanks[id];
+        
+        if (this_tank.time_to_fire > 0) {
+            this_tank.time_to_fire -= 1;
+        }
+
         if (this_tank.blood <= 0) {
             let this_socket: SocketIO.Socket = socket_list[this_tank.id];
             this_socket.disconnect();
