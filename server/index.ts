@@ -215,8 +215,6 @@ setInterval(() => {
 
             this_tank.pos.x = Math.max(half_tank_size, this_tank.pos.x);
             this_tank.pos.y = Math.max(half_tank_size, this_tank.pos.y);
-
-            this_tank.is_moving = false;
         }
     }
 
