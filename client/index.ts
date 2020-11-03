@@ -87,5 +87,5 @@ $(function () {
 	$('#stop-button').on('click', stop);
 
 	$('#stop-button').attr("disabled", "true");
-	message('Client loaded. [V1.1b1]');
+	message('Client loaded. [V1.2b1]');
 });
