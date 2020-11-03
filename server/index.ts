@@ -168,7 +168,7 @@ io.on('connection', (socket: SocketIO.Socket) => {
     });
 
     socket.on('fire', (level: number) => {
-        if (!this_tank.can_safe_fire || typeof (level) !== "number" || level > 4 || level < 0) {
+        if (!this_tank.can_safe_fire || typeof (level) !== "number" || level > 5 || level < 0) {
             this_tank.blood -= Config.tanks.fire_too_much_damage;
             return;
         }
