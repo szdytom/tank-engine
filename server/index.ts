@@ -83,6 +83,11 @@ function check_outof_space(pos: Position) {
     return false;
 }
 
+function move_position(pos: Position, angle: number, distance: number) {
+    pos.x += distance * Math.cos(covert_degree(angle));
+    pos.y += distance * Math.sin(covert_degree(angle));
+}
+
 const app = Express();
 const http = new http_server.Server(app);
 const io = new SocketIO(http);
@@ -163,7 +168,7 @@ io.on('connection', (socket: SocketIO.Socket) => {
     });
 
     socket.on('fire', (level: number) => {
-        if (!this_tank.can_safe_fire || typeof (level) !== "number" || level > 4 || level < 0) {
+        if (!this_tank.can_safe_fire || typeof (level) !== "number" || level > 5 || level < 0) {
             this_tank.blood -= Config.tanks.fire_too_much_damage;
             return;
         }
@@ -183,10 +188,13 @@ setInterval(() => {
     for (let id in bullets) {
         let this_bullet = bullets[id];
 
-        this_bullet.pos.x += Config.bullet.speed * Math.cos(covert_degree(this_bullet.dire));
-        this_bullet.pos.y += Config.bullet.speed * Math.sin(covert_degree(this_bullet.dire));
-        if (check_crash_bullet(this_bullet) || check_outof_space(this_bullet.pos)) {
-            bullets.splice(<number><any>id, 1);
+        const move_split_time = 5;
+        for (let i = 1; i <= move_split_time; i += 1) {
+            move_position(this_bullet.pos, this_bullet.dire, Config.bullet.speed / move_split_time);
+            if (check_crash_bullet(this_bullet) || check_outof_space(this_bullet.pos)) {
+                bullets.splice(<number><any>id, 1);
+                break;
+            }
         }
     }
 
@@ -203,8 +211,7 @@ setInterval(() => {
             continue;
         }
 
-        this_tank.pos.x += Config.tanks.max_speed * Math.cos(covert_degree(this_tank.tank_dire));
-        this_tank.pos.y += Config.tanks.max_speed * Math.sin(covert_degree(this_tank.tank_dire));
+        move_position(this_tank.pos, this_tank.tank_dire, Config.tanks.max_speed);
 
         if (check_outof_space(this_tank.pos)) {
             this_tank.blood -= Config.tanks.crash_damage;
@@ -215,8 +222,6 @@ setInterval(() => {
 
             this_tank.pos.x = Math.max(half_tank_size, this_tank.pos.x);
             this_tank.pos.y = Math.max(half_tank_size, this_tank.pos.y);
-
-            this_tank.is_moving = false;
         }
     }
 
