@@ -83,6 +83,11 @@ function check_outof_space(pos: Position) {
     return false;
 }
 
+function move_position(pos: Position, angle: number, distance: number) {
+    pos.x += distance * Math.cos(covert_degree(angle));
+    pos.y += distance * Math.sin(covert_degree(angle));
+}
+
 const app = Express();
 const http = new http_server.Server(app);
 const io = new SocketIO(http);
@@ -183,10 +188,13 @@ setInterval(() => {
     for (let id in bullets) {
         let this_bullet = bullets[id];
 
-        this_bullet.pos.x += Config.bullet.speed * Math.cos(covert_degree(this_bullet.dire));
-        this_bullet.pos.y += Config.bullet.speed * Math.sin(covert_degree(this_bullet.dire));
-        if (check_crash_bullet(this_bullet) || check_outof_space(this_bullet.pos)) {
-            bullets.splice(<number><any>id, 1);
+        const move_split_time = 5;
+        for (let i = 1; i <= move_split_time) {
+            move_position(this_bullet.pos, this_bullet.dire, Config.bullet.speed / move_split_time);
+            if (check_crash_bullet(this_bullet) || check_outof_space(this_bullet.pos)) {
+                bullets.splice(<number><any>id, 1);
+                break;
+            }
         }
     }
 
