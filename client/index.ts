@@ -22,7 +22,7 @@ function start_by_code(code: string) {
 		let iid = setInterval(() => {
 			if (code_loaded) {
 				clearInterval(iid);
-				resolve();
+				resolve(void(0));
 			}
 		}, Config.game.update)
 	});
