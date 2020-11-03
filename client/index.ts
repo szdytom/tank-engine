@@ -7,14 +7,17 @@ import { bullets, set_bullets, set_socket, set_tanks, tanks, socket } from './gl
 import Tank from '../shared/tanks';
 import Bullet from '../shared/bullet';
 
-
 function message(x: string) {
-	$("#message").text(x);
+	$('#message').text(x);
+	console.log(x);
+	$('#virtual-console').val($('#virtual-console').val() + x + '\n');
 }
 
 function start_by_code(code: string) {
-	$("#stop-button").removeAttr("disabled");
-	$('#start-button').attr("disabled", "true");
+	$('#stop-button').removeAttr('disabled');
+	$('#start-button').attr('disabled', 'true');
+
+	$('#run-control').css('display', 'block');
 
 	let server_url: string = '/';
 	let code_loaded: boolean = false;
@@ -79,13 +82,20 @@ function stop() {
 
 function on_stop() {
 	$('#stop-button').attr("disabled", "true");
+	$('#code').css('display', 'inline');
 }
 
 $(function () {
 	console.log("Init");
+
+	$('#run-control').css('display', 'none');
+	
 	$('#start-button').on('click', start);
 	$('#stop-button').on('click', stop);
-
+	
 	$('#stop-button').attr("disabled", "true");
-	message('Client loaded. [V1.2b1]');
+	
+	$('#virtual-console').val('');
+
+	message('Client loaded. [V1.2b3]');
 });

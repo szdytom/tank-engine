@@ -1,7 +1,16 @@
+import $ = require('jquery');
 import {tanks, bullets, socket} from './global';
 import Config from '../shared/config';
+import Tank from '../shared/tanks';
 
 export default function () {
+    let this_tank:Tank = tanks[socket.id];
+    $('#data-move-angle').text(this_tank.angle.tank);
+    $('#data-gun-angle').text(this_tank.angle.gun);
+    $('#data-radar-angle').text(this_tank.angle.radar);
+    $('#data-pos-x').text(this_tank.pos.x.toString());
+    $('#data-pos-y').text(this_tank.pos.y.toString());
+
     const canvas = <HTMLCanvasElement>document.getElementById('space');
     const ctx = canvas.getContext('2d');
     ctx.clearRect(0, 0, Config.space.width, Config.space.height);

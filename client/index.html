@@ -11,8 +11,23 @@
         <canvas height="800px" width="1000px" id="space"></canvas>
         <div class="control">
             <textarea id="code" autocomplete="off" spellcheck="false" placeholder="Paste your code or code URL here..."></textarea>
+            
+            <div id="run-control">
+                <div id="data">
+                    <label>Tank Statics</label>
+                    <p>Move Angle: <span id="data-move-angle"></span></p>
+                    <p>Gun Angle: <span id="data-gun-angle"></span></p>
+                    <p>Radar Angle: <span id="data-radar-angle"></span></p>
+                    <p>Postion: X: <span id="data-pos-x"></span> Y: <span id="data-pos-y"></span></p>
+                </div>
+                <button id="ctr-tk-fire">Fire</button>
+                <button id="ctr-tk-move">Start Move</button>
+                <button id="ctr-tk-stop">Stop Move</button> <br />
+                <textarea id="virtual-console" readonly></textarea>
+            </div>
+
             <button class="bottom_button" id="start-button">Start</button>
-            <button class="bottom_button" id="stop-button">Stop</button>
+            <button class="bottom_button" id="stop-button">Resign</button>
         </div>
     </main>
     <div id="message"></div>
@@ -34,7 +49,7 @@
         .control {
             border-radius: 5px;
             margin-top: 20px;
-            margin-bottom: 100px;
+            margin-bottom: 500px;
             margin-left: calc(50vw - 500px);
             width: 1000px;
             height: 800px;

@@ -9,9 +9,9 @@ const Config = {
     tanks: {
         max_speed: 5.12,
         turn_speed: {
-            tank: 180,
-            radar: 1080,
-            gun: 720,
+            tank: 7.2,
+            radar: 43.2,
+            gun: 28.8,
         },
         fire_speed: [1, 18, 24, 31, 88, 210],
         fire_too_much_damage: 0.05,

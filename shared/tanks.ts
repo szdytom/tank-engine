@@ -5,9 +5,11 @@ interface Tank {
     blood: number,
     name: string,
     time_to_fire: number,
-    tank_dire: number,
-    gun_dire: number,
-    radar_dire: number,
+    angle: {
+        gun: number,
+        radar: number,
+        tank: number,
+    },
     is_moving: boolean,
     id: string,
 }

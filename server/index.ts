@@ -27,15 +27,17 @@ function get_line_slope(d: number): number {
 }
 
 function create_tank(id: string): Tank {
-    let dire = get_random_direction();
+    let default_angle = get_random_direction();
     return {
         pos: get_random_position(),
         blood: 1.0,
         name: "<unnamed> " + id,
         time_to_fire: 0,
-        tank_dire: dire,
-        gun_dire: dire,
-        radar_dire: dire,
+        angle: {
+            tank: default_angle,
+            gun: default_angle,
+            radar: default_angle,
+        },
         is_moving: false,
         id: id,
     };
@@ -47,7 +49,7 @@ function create_bullet(tank: Tank, level: number) {
             x: tank.pos.x,
             y: tank.pos.y,
         },
-        dire: tank.gun_dire,
+        dire: tank.angle.gun,
         level: level,
         source: tank.id,
     };
@@ -107,62 +109,27 @@ io.on('connection', (socket: SocketIO.Socket) => {
         console.log("One tank disconnected.");
     });
 
-    socket.on('turn-tank', (target: number) => {
-        let once_update: number = Config.tanks.turn_speed.tank / (1000 / Config.game.update);
-        if (target - this_tank.tank_dire < 0) {
+    socket.on('turn', (info: { type: string, target: number }) => {
+        let target = info.target % 360;
+        let type_id: string = info.type;
+
+        let once_update: number = Config.tanks.turn_speed[type_id];
+        once_update %= 360;
+        if (target - this_tank.angle[type_id] < 0) {
             once_update *= -1;
         }
 
         let iid = setInterval(() => {
-            if (this_tank.tank_dire == target) {
+            if (this_tank.angle[type_id] == target) {
                 clearInterval(iid);
                 return;
             }
 
-            if (Math.abs(target - this_tank.tank_dire) < Math.abs(once_update)) {
-                this_tank.tank_dire = target;
+            if (Math.abs(target - this_tank.angle[type_id]) < Math.abs(once_update)) {
+                this_tank.angle[type_id] = target;
             } else {
-                this_tank.tank_dire += once_update;
-            }
-        }, Config.game.update);
-    });
-
-    socket.on('turn-gun', (target: number) => {
-        let once_update: number = Config.tanks.turn_speed.gun / (1000 / Config.game.update);
-        if (target - this_tank.gun_dire < 0) {
-            once_update *= -1;
-        }
-
-        let iid = setInterval(() => {
-            if (this_tank.gun_dire == target) {
-                clearInterval(iid);
-                return;
-            }
-
-            if (Math.abs(target - this_tank.gun_dire) < Math.abs(once_update)) {
-                this_tank.gun_dire = target;
-            } else {
-                this_tank.gun_dire += once_update;
-            }
-        }, Config.game.update);
-    });
-
-    socket.on('turn-radar', (target: number) => {
-        let once_update: number = Config.tanks.turn_speed.radar / (1000 / Config.game.update);
-        if (target - this_tank.radar_dire < 0) {
-            once_update *= -1;
-        }
-
-        let iid = setInterval(() => {
-            if (this_tank.radar_dire == target) {
-                clearInterval(iid);
-                return;
-            }
-
-            if (Math.abs(target - this_tank.radar_dire) < Math.abs(once_update)) {
-                this_tank.radar_dire = target;
-            } else {
-                this_tank.radar_dire += once_update;
+                this_tank.angle[type_id] += once_update;
+                this_tank.angle[type_id] %= 360;
             }
         }, Config.game.update);
     });
@@ -205,7 +172,7 @@ setInterval(() => {
 
     for (let id in tanks) {
         let this_tank: Tank = tanks[id];
-        
+
         if (this_tank.time_to_fire > 0) {
             this_tank.time_to_fire -= 1;
         }
@@ -221,7 +188,7 @@ setInterval(() => {
             continue;
         }
 
-        move_position(this_tank.pos, this_tank.tank_dire, Config.tanks.max_speed);
+        move_position(this_tank.pos, this_tank.angle.tank, Config.tanks.max_speed);
 
         if (check_outof_space(this_tank.pos)) {
             this_tank.blood -= Config.tanks.crash_damage;

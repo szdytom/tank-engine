@@ -2,6 +2,7 @@ import Tank from '../shared/tanks';
 import Config from '../shared/config';
 import 'socket.io-client';
 import { tanks, socket } from './global';
+import Position from '../shared/positions';
 
 class TankController {
     private tank_id: string
@@ -12,54 +13,69 @@ class TankController {
         this.on_scan_callback = () => { this.do_nothing(); };
     }
 
-    get_x() {
-        return tanks[this.tank_id].pos.x;
+    get_x(): number {
+        let this_tank: Tank = tanks[this.tank_id];
+        return this_tank.pos.x;
     }
 
-    get_y() {
-        return tanks[this.tank_id].pos.y;
+    get_y(): number {
+        let this_tank: Tank = tanks[this.tank_id];
+        return this_tank.pos.y;
     }
 
-    get_pos() {
-        return tanks[this.tank_id].pos;
+    get_pos(): Position {
+        let this_tank: Tank = tanks[this.tank_id];
+        return this_tank.pos;
     }
 
-    get_direction() {
-        return tanks[this.tank_id].tank_dire;
+    get_direction(): number {
+        let this_tank: Tank = tanks[this.tank_id];
+        return this_tank.angle.tank;
     }
 
-    get_gun_direction() {
-        return tanks[this.tank_id].gun_dire;
+    get_gun_direction(): number {
+        let this_tank: Tank = tanks[this.tank_id];
+        return this_tank.angle.gun;
     }
 
-    get_radar_direction() {
-        return tanks[this.tank_id].radar_dire;
+    get_radar_direction(): number {
+        let this_tank: Tank = tanks[this.tank_id];
+        return this_tank.angle.radar;
     }
 
-    get_blood() {
+    get_blood(): number {
         let this_tank: Tank = tanks[this.tank_id];
         return this_tank.blood;
     }
 
-    can_fire() {
+    can_fire(): boolean {
         let this_tank: Tank = tanks[this.tank_id];
         return this_tank.time_to_fire <= 0;
     }
 
-    fire(level: number) {
+    fire(level: number): void {
         socket.emit('fire', level - 1);
     }
 
-    turn_to(target: number) {
-        socket.emit('turn-tank', target);
+    turn_to(target: number): void {
+        socket.emit('turn', {
+            type: 'tank',
+            target: target,
+        });
     }
 
-    turn_gun_to(target: number) {
-        socket.emit('turn-gun', target);
+    turn_gun_to(target: number): void {
+        socket.emit('turn', {
+            type: 'gun',
+            target: target,
+        });
     }
 
-    turn_radar_to(target: number) {
-        socket.emit('turn-radar', target);
+    turn_radar_to(target: number): void {
+        socket.emit('turn', {
+            type: 'radar',
+            target: target,
+        });
     }
 
     move(): boolean {
@@ -100,13 +116,13 @@ class TankController {
         };
     }
 
-    do_nothing() { }
+    do_nothing(): void { }
 
-    get_config() {
+    get_config(): any {
         return JSON.parse(JSON.stringify(Config));
     }
 
-    set_name(name: string) {
+    set_name(name: string): void {
         socket.emit('set-name', name);
     }
 
@@ -114,10 +130,6 @@ class TankController {
         setInterval(() => {
             callback();
         }, Config.game.update);
-    }
-
-    _update() {
-        tanks[this.tank_id] = tanks[socket.id];
     }
 }
 
@@ -134,7 +146,6 @@ function get_line_slope(d: number): number {
 
 function update_tanks() {
     if (tc === undefined) { return; }
-    tc._update();
     tc._do_scan();
 }
 
