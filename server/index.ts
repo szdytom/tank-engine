@@ -98,38 +98,59 @@ let tanks = new Object();
 let socket_list = new Array<SocketIO.Socket>();
 
 io.on('connection', (socket: SocketIO.Socket) => {
-    console.log("One tank joined: " + socket.id);
+    console.log("One tank joined: " + socket.id + "@" + socket.handshake.address);
 
     socket_list[socket.id] = socket;
     let this_tank = create_tank(socket.id);
     tanks[socket.id] = this_tank;
 
+    let turning_iid: {tank: NodeJS.Timeout, gun: NodeJS.Timeout, radar: NodeJS.Timeout} = {
+        tank: null,
+        gun: null,
+        radar: null,
+    };
+
     socket.on('disconnect', () => {
         delete tanks[socket.id];
-        console.log("One tank disconnected.");
+        console.log("Tank " + socket.id + " disconnected.");
     });
 
     socket.on('turn', (info: { type: string, target: number }) => {
         let target = info.target % 360;
+        if (target < 0) { target += 360; }
+
         let type_id: string = info.type;
 
         let once_update: number = Config.tanks.turn_speed[type_id];
+
+        if (once_update >= 360) {
+            this_tank.angle[type_id] = target;
+            return;
+        }
+
         once_update %= 360;
-        if (target - this_tank.angle[type_id] < 0) {
+        if (Math.abs(target - this_tank.angle[type_id]) > 180) {
             once_update *= -1;
         }
 
-        let iid = setInterval(() => {
+        if (turning_iid[type_id] != null) {
+            clearInterval(turning_iid[type_id]);
+        }
+
+        turning_iid[type_id] = setInterval(() => {
             if (this_tank.angle[type_id] == target) {
-                clearInterval(iid);
+                clearInterval(turning_iid[type_id]);
+                turning_iid[type_id] = null;
                 return;
             }
 
-            if (Math.abs(target - this_tank.angle[type_id]) < Math.abs(once_update)) {
+            if (Math.abs(target - this_tank.angle[type_id]) <= Math.abs(once_update)) {
                 this_tank.angle[type_id] = target;
             } else {
                 this_tank.angle[type_id] += once_update;
                 this_tank.angle[type_id] %= 360;
+
+                if (this_tank.angle[type_id] < 0) { this_tank.angle[type_id] += 360; }
             }
         }, Config.game.update);
     });
