@@ -2,16 +2,11 @@ import $ = require('jquery');
 import io = require('socket.io-client');
 import ui from './ui';
 import Config from '../shared/config';
-import { start_code, update_tanks } from './api';
+import { set_up, start_code, update_tanks } from './api';
 import { bullets, set_bullets, set_socket, set_tanks, tanks, socket } from './global';
 import Tank from '../shared/tanks';
 import Bullet from '../shared/bullet';
-
-function message(x: string) {
-	$('#message').text(x);
-	console.log(x);
-	$('#virtual-console').val($('#virtual-console').val() + x + '\n');
-}
+import vt from './vt';
 
 function start_by_code(code: string) {
 	$('#stop-button').removeAttr('disabled');
@@ -32,11 +27,11 @@ function start_by_code(code: string) {
 
 	set_socket(io(server_url));
 	socket.on('connection', function () {
-		message('Connected');
+		vt.info('Connected.');
 	});
 
 	socket.on('disconnect', function () {
-		message('[Disconnect]You are killed.');
+		vt.info('Disconnected. You are killed.');
 		on_stop();
 	});
 
@@ -50,7 +45,7 @@ function start_by_code(code: string) {
 
 	let parsed_code = new Function('tk', '$', code);
 	load_tank_code.then(() => {
-		message('Tank control codes loaded.');
+		vt.info('Tank control codes loaded.');
 		start_code(parsed_code);
 	});
 }
@@ -64,11 +59,11 @@ function start() {
 				return response.text();
 			})
 			.then(function (remote_code) {
-				message('Remote code downloaded.');
+				vt.info('Remote code downloaded.');
 				start_by_code(remote_code);
 			})
 			.catch(function () {
-				message('Error when downloading the remote code.')
+				vt.error('Error when downloading the remote code.')
 			});
 	} else {
 		start_by_code(code);
@@ -96,6 +91,7 @@ $(function () {
 	$('#stop-button').attr("disabled", "true");
 	
 	$('#virtual-console').val('');
+	set_up();
 
-	message('Client loaded. [V1.2b3]');
+	vt.info('Client loaded. (V1.3b2)');
 });

@@ -10,8 +10,6 @@
     <main>
         <canvas height="800px" width="1000px" id="space"></canvas>
         <div class="control">
-            <textarea id="code" autocomplete="off" spellcheck="false" placeholder="Paste your code or code URL here..."></textarea>
-            
             <div id="run-control">
                 <div id="data">
                     <label>Tank Statics</label>
@@ -25,6 +23,8 @@
                 <button id="ctr-tk-stop">Stop Move</button> <br />
                 <textarea id="virtual-console" readonly></textarea>
             </div>
+
+            <textarea id="code" autocomplete="off" spellcheck="false" placeholder="Paste your code or code URL here..."></textarea>
 
             <button class="bottom_button" id="start-button">Start</button>
             <button class="bottom_button" id="stop-button">Resign</button>
@@ -105,6 +105,11 @@
 
         button:hover {
             background-color: #3ba5ec;
+        }
+
+        #virtual-console {
+            width: 100%;
+            min-height: 150px;
         }
     </style>
 </body>

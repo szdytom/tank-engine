@@ -3,6 +3,7 @@ import Config from '../shared/config';
 import 'socket.io-client';
 import { tanks, socket } from './global';
 import Position from '../shared/positions';
+import $ = require('jquery');
 
 class TankController {
     private tank_id: string
@@ -95,16 +96,17 @@ class TankController {
     }
 
     _do_scan(): void {
-        let radar_angle = tanks[this.tank_id].radar_dire;
+        let this_tank: Tank = tanks[this.tank_id];
+        let radar_angle = this_tank.angle.radar;
         let high_slope = get_line_slope(radar_angle + Config.tanks.radar_size);
         let low_slope = get_line_slope(radar_angle - Config.tanks.radar_size);
         let upper_slope = Math.min(high_slope, low_slope);
         let lower_slope = Math.max(high_slope, low_slope);
         for (let id in tanks) {
             let element = tanks[id];
-            if (element.id == tanks[this.tank_id].id) { continue; }
+            if (element.id == this.tank_id) { continue; }
 
-            let target_slope = (element.pos.x - tanks[this.tank_id].pos.x) / (element.pos.y - tanks[this.tank_id].pos.y);
+            let target_slope = (element.pos.x - this_tank.pos.x) / (element.pos.y - this_tank.pos.y);
             if (upper_slope <= target_slope && target_slope <= lower_slope) {
                 // scanned
                 this.on_scan_callback({
@@ -155,7 +157,14 @@ function start_code(parsed_code: Function) {
     parsed_code(tc, custom_var);
 }
 
+function set_up() {
+    $('#ctr-tk-fire').on('click', () => { tc.fire(2); });
+    $('#ctr-tk-move').on('click', () => { tc.move(); });
+    $('#ctr-tk-stop').on('click', () => { tc.stop(); });
+}
+
 export {
     start_code,
-    update_tanks
+    update_tanks,
+    set_up,
 };
