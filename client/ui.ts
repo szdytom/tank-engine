@@ -10,6 +10,8 @@ export default function () {
     $('#data-radar-angle').text(this_tank.angle.radar);
     $('#data-pos-x').text(this_tank.pos.x.toString());
     $('#data-pos-y').text(this_tank.pos.y.toString());
+    $('#data-time-to-fire').text(this_tank.time_to_fire.toString());
+    $('#data-blood').text(this_tank.blood.toString());
 
     const canvas = <HTMLCanvasElement>document.getElementById('space');
     const ctx = canvas.getContext('2d');

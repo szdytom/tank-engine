@@ -112,6 +112,8 @@ class TankController {
                 this.on_scan_callback({
                     x: element.pos.x,
                     y: element.pos.y,
+                    blood: element.blood,
+                    is_moving: element.is_moving,
                     name: element.name,
                 });
             }

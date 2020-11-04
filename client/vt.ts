@@ -8,7 +8,7 @@ function message(x: string) {
 	$('#message').text(x);
     $('#virtual-console').val($('#virtual-console').val() + x + '\n');
     setTimeout(() => {
-        $('#message').text('');
+        $('#message').text(' ');
     }, clear_message_delay);
 }
 
