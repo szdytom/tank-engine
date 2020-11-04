@@ -2,7 +2,7 @@ import $ = require('jquery');
 import io = require('socket.io-client');
 import ui from './ui';
 import Config from '../shared/config';
-import { set_up, start_code, update_tanks } from './api';
+import { set_up_control, start_code, update_tanks } from './api';
 import { bullets, set_bullets, set_socket, set_tanks, tanks, socket } from './global';
 import Tank from '../shared/tanks';
 import Bullet from '../shared/bullet';
@@ -91,7 +91,7 @@ $(function () {
 	$('#stop-button').attr("disabled", "true");
 	
 	$('#virtual-console').val('');
-	set_up();
+	set_up_control();
 
-	vt.info('Client loaded. (V1.3b2)');
+	vt.info('Client loaded. (V1.3b3 +5)');
 });

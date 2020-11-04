@@ -191,14 +191,19 @@ function start_code(parsed_code: Function) {
     parsed_code(tc, custom_var);
 }
 
-function set_up() {
-    $('#ctr-tk-fire').on('click', () => { tc.fire(2); });
-    $('#ctr-tk-move').on('click', () => { tc.move(); });
-    $('#ctr-tk-stop').on('click', () => { tc.stop(); });
+function set_up_control() {
+    let set_disable = (element: JQuery<HTMLElement>) => {
+        element.attr('disabled', 'true');
+        setTimeout(() => { element.removeAttr('disabled'); }, 5000);
+    }
+
+    $('#ctr-tk-fire').on('click', () => { tc.fire(2); set_disable($('#ctr-tk-fire')); });
+    $('#ctr-tk-move').on('click', () => { tc.move(); set_disable($('#ctr-tk-move')); });
+    $('#ctr-tk-stop').on('click', () => { tc.stop(); set_disable($('#ctr-tk-stop')); });
 }
 
 export {
     start_code,
     update_tanks,
-    set_up,
+    set_up_control,
 };
