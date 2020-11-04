@@ -1,10 +1,10 @@
 import $ = require('jquery');
-import {tanks, bullets, socket} from './global';
+import { tanks, bullets, socket } from './global';
 import Config from '../shared/config';
 import Tank from '../shared/tanks';
 
 export default function () {
-    let this_tank:Tank = tanks[socket.id];
+    let this_tank: Tank = tanks[socket.id];
     $('#data-move-angle').text(this_tank.angle.tank);
     $('#data-gun-angle').text(this_tank.angle.gun);
     $('#data-radar-angle').text(this_tank.angle.radar);
@@ -14,24 +14,26 @@ export default function () {
     $('#data-blood').text(this_tank.blood.toString());
 
     const canvas = <HTMLCanvasElement>document.getElementById('space');
-    const ctx = canvas.getContext('2d');
-    ctx.clearRect(0, 0, Config.space.width, Config.space.height);
-    
+    const ctx = canvas.getContext('2d', { alpha: false });
+
+    ctx.fillStyle = "#FFFFFF";
+    ctx.fillRect(0, 0, Config.space.width, Config.space.height);
+
     ctx.fillStyle = "brown";
-    const bullect_draw_size = 5;
+    const bullect_draw_size = 4;
     for (let id in bullets) {
         let this_bullet = bullets[id];
         if (this_bullet.level > 0) {
             ctx.fillRect(
-                this_bullet.pos.x - bullect_draw_size / 2, 
-                this_bullet.pos.y - bullect_draw_size / 2, 
-                bullect_draw_size, 
+                Math.floor(this_bullet.pos.x - bullect_draw_size / 2),
+                Math.floor(this_bullet.pos.y - bullect_draw_size / 2),
+                bullect_draw_size,
                 bullect_draw_size);
         } else {
             ctx.strokeRect(
-                this_bullet.pos.x - bullect_draw_size / 2, 
-                this_bullet.pos.y - bullect_draw_size / 2, 
-                bullect_draw_size, 
+                Math.floor(this_bullet.pos.x - bullect_draw_size / 2),
+                Math.floor(this_bullet.pos.y - bullect_draw_size / 2),
+                bullect_draw_size,
                 bullect_draw_size);
         }
     }
@@ -41,12 +43,16 @@ export default function () {
         if (id === socket.id) { ctx.fillStyle = "green"; }
         else { ctx.fillStyle = "orange"; }
 
-        ctx.fillRect(this_tank.pos.x - Config.tanks.size / 2,
-            this_tank.pos.y - Config.tanks.size / 2,
+        ctx.fillRect(
+            Math.floor(this_tank.pos.x - Config.tanks.size / 2),
+            Math.floor(this_tank.pos.y - Config.tanks.size / 2),
             Config.tanks.size,
             Config.tanks.size);
 
         ctx.fillStyle = "black";
-        ctx.fillText(Math.ceil(this_tank.blood * 100).toString() + '%', this_tank.pos.x, this_tank.pos.y);
+        ctx.fillText(
+            Math.ceil(this_tank.blood * 100).toString() + '%', 
+            Math.floor(this_tank.pos.x), 
+            Math.floor(this_tank.pos.y));
     }
 };
