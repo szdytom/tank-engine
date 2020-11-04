@@ -56,16 +56,24 @@ function create_bullet(tank: Tank, level: number) {
     bullets.push(this_bullet);
 }
 
-function check_crash_bullet(bullet: Bullet) {
+function check_crash_bullet(this_bullet: Bullet) {
+    const this_bullet_damage = Config.bullet.damage[this_bullet.level];
+
     for (let id in tanks) {
-        if (bullet.source === id) { continue; }
+        if (this_bullet.source === id) { continue; }
 
         let this_tank = tanks[id];
-        if (bullet.pos.x >= this_tank.pos.x - Config.tanks.size / 2
-            && bullet.pos.x <= this_tank.pos.x + Config.tanks.size / 2
-            && bullet.pos.y >= this_tank.pos.y - Config.tanks.size / 2
-            && bullet.pos.y <= this_tank.pos.y + Config.tanks.size / 2) {
-            this_tank.blood -= Config.bullet.damage[bullet.level];
+        if (this_bullet.pos.x >= this_tank.pos.x - Config.tanks.size / 2
+            && this_bullet.pos.x <= this_tank.pos.x + Config.tanks.size / 2
+            && this_bullet.pos.y >= this_tank.pos.y - Config.tanks.size / 2
+            && this_bullet.pos.y <= this_tank.pos.y + Config.tanks.size / 2) {
+            this_tank.blood -= this_bullet_damage;
+            
+            let source_tank: Tank = tanks[this_bullet.source];
+            if (source_tank !== undefined) {
+                source_tank.blood += this_bullet_damage / 5;
+            }
+
             return true;
         }
     }

@@ -11,10 +11,10 @@ export default function () {
     $('#data-pos-x').text(this_tank.pos.x.toString());
     $('#data-pos-y').text(this_tank.pos.y.toString());
     $('#data-time-to-fire').text(this_tank.time_to_fire.toString());
-    $('#data-blood').text(this_tank.blood.toString());
+    $('#data-blood').text((this_tank.blood * 100).toString());
 
-    const canvas = <HTMLCanvasElement>document.getElementById('space');
-    const ctx = canvas.getContext('2d', { alpha: false });
+    const canvas: HTMLCanvasElement = <HTMLCanvasElement>document.getElementById('space');;
+    const ctx: CanvasRenderingContext2D = canvas.getContext('2d', { alpha: false });
 
     ctx.fillStyle = "#FFFFFF";
     ctx.fillRect(0, 0, Config.space.width, Config.space.height);
@@ -51,8 +51,9 @@ export default function () {
 
         ctx.fillStyle = "black";
         ctx.fillText(
-            Math.ceil(this_tank.blood * 100).toString() + '%', 
-            Math.floor(this_tank.pos.x), 
-            Math.floor(this_tank.pos.y));
+            Math.ceil(this_tank.blood * 100).toString(),
+            Math.floor(this_tank.pos.x),
+            Math.floor(this_tank.pos.y),
+            40);
     }
 };
