@@ -4,6 +4,7 @@ import 'socket.io-client';
 import { tanks, socket } from './global';
 import Position from '../shared/positions';
 import $ = require('jquery');
+import vt from './vt';
 
 class TankController {
     private tank_id: string
@@ -29,19 +30,34 @@ class TankController {
         return this_tank.pos;
     }
 
-    get_direction(): number {
+    get_angle(): number {
         let this_tank: Tank = tanks[this.tank_id];
         return this_tank.angle.tank;
     }
 
-    get_gun_direction(): number {
+    get_gun_angle(): number {
         let this_tank: Tank = tanks[this.tank_id];
         return this_tank.angle.gun;
     }
 
-    get_radar_direction(): number {
+    get_radar_angle(): number {
         let this_tank: Tank = tanks[this.tank_id];
         return this_tank.angle.radar;
+    }
+
+    get_direction(): number {
+        vt.warn('Function get_direction() is deprecated. Please use get_angle() instead.');
+        return this.get_angle();
+    }
+
+    get_gun_direction(): number {
+        vt.warn('Function get_gun_direction() is deprecated. Please use get_gun_angle() instead.');
+        return this.get_gun_angle();
+    }
+
+    get_radar_direction(): number {
+        vt.warn('Function get_radar_direction() is deprecated. Please use get_radar_angle() instead.');
+        return this.get_radar_angle();
     }
 
     get_blood(): number {
