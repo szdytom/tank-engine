@@ -33,8 +33,15 @@ function error(x: string) {
     message(x);
 }
 
+function debug(x: any) {
+    console.log(x);
+    x = JSON.stringify(x);
+    $('#virtual-console').val($('#virtual-console').val() + x + '\n');
+}
+
 export default {
     info: info,
     warn: warn,
     error: error,
+    debug: debug,
 };

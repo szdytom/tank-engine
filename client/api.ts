@@ -146,10 +146,26 @@ class TankController {
         socket.emit('set-name', name);
     }
 
-    loop(callback: Function): void {
+    loop(callback: () => void): void {
         setInterval(() => {
             callback();
         }, Config.game.update);
+    }
+
+    vt_debug(msg: any): void {
+        vt.debug(msg);
+    }
+
+    vt_info(msg: any): void {
+        vt.info(JSON.stringify(msg));
+    }
+
+    vt_warn(msg: any): void {
+        vt.warn(JSON.stringify(msg));
+    }
+
+    vt_error(msg: any): void {
+        vt.error(JSON.stringify(msg));
     }
 }
 
