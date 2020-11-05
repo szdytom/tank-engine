@@ -54,17 +54,9 @@ function start() {
 	let code: string = $('#code').val().toString();
 	if (code.startsWith('http')) {
 		// is an URL
-		fetch(code)
-			.then(function (response) {
-				return response.text();
-			})
-			.then(function (remote_code) {
-				vt.info('Remote code downloaded.');
-				start_by_code(remote_code);
-			})
-			.catch(function () {
-				vt.error('Error when downloading the remote code.')
-			});
+		$.get('/webjs', {url: code}, (web_code: string): void => {
+			start_by_code(web_code);
+		});
 	} else {
 		start_by_code(code);
 	}
@@ -93,5 +85,5 @@ $(function () {
 	$('#virtual-console').val('');
 	set_up_control();
 
-	vt.info('Client loaded. (V1.3b3 +5)');
+	vt.info('Client loaded. (V1.3b3 +6)');
 });

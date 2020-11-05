@@ -2,6 +2,7 @@ import SocketIO = require('socket.io');
 import Express = require('express');
 import http_server = require('http');
 import path = require('path');
+import axios from 'axios';
 import Config from '../shared/config';
 import Position from '../shared/positions';
 import Tank from '../shared/tanks';
@@ -68,7 +69,7 @@ function check_crash_bullet(this_bullet: Bullet) {
             && this_bullet.pos.y >= this_tank.pos.y - Config.tanks.size / 2
             && this_bullet.pos.y <= this_tank.pos.y + Config.tanks.size / 2) {
             this_tank.blood -= this_bullet_damage;
-            
+
             let source_tank: Tank = tanks[this_bullet.source];
             if (source_tank !== undefined) {
                 source_tank.blood += this_bullet_damage / 5;
@@ -112,7 +113,7 @@ io.on('connection', (socket: SocketIO.Socket) => {
     let this_tank = create_tank(socket.id);
     tanks[socket.id] = this_tank;
 
-    let turning_iid: {tank: NodeJS.Timeout, gun: NodeJS.Timeout, radar: NodeJS.Timeout} = {
+    let turning_iid: { tank: NodeJS.Timeout, gun: NodeJS.Timeout, radar: NodeJS.Timeout } = {
         tank: null,
         gun: null,
         radar: null,
@@ -235,4 +236,22 @@ setInterval(() => {
 }, Config.game.update);
 
 app.use('/', Express.static(path.join(__dirname + '../../../../client/')));
+app.get('/webjs', (req, res) => {
+    let url: string = req.query.url.toString();
+    console.log(`Web JS Fetch: ${url}`);
+
+    if (url === undefined || !url.startsWith('http')) {
+        res.status(400).send(`Not a url: ${url}.`);
+        return;
+    }
+
+    axios.get(url, { timeout: 10000 })
+        .then((resualt) => {
+            res.send(resualt.data);
+        })
+        .catch(() => {
+            res.status(400).send(`Failed to get ${url}.`);
+        });
+});
+
 http.listen(3000, () => { console.log("Server started on Port 3000."); });

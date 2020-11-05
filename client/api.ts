@@ -71,6 +71,8 @@ class TankController {
     }
 
     fire(level: number): void {
+        let this_tank: Tank = tanks[this.tank_id];
+        this_tank.time_to_fire = Infinity;
         socket.emit('fire', level - 1);
     }
 
