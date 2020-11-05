@@ -32,7 +32,7 @@ function create_tank(id: string): Tank {
     return {
         pos: get_random_position(),
         blood: 1.0,
-        name: `unnamed <${id}>`,
+        name: `unnamed < ${id} >`,
         time_to_fire: 0,
         angle: {
             tank: default_angle,
@@ -183,7 +183,7 @@ io.on('connection', (socket: SocketIO.Socket) => {
 
     socket.on('move', (state: boolean) => { this_tank.is_moving = state; });
 
-    socket.on('set-name', (name: string) => { this_tank.name = name + "<" + socket.id + ">"; });
+    socket.on('set-name', (name: string) => { this_tank.name = `${name} < ${socket.id} >`; });
 });
 
 
