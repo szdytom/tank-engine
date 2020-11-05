@@ -70,7 +70,11 @@ class TankController {
         return this_tank.time_to_fire <= 0;
     }
 
-    fire(level: number): void {
+    fire(level?: number): void {
+        if (!level) {
+            level = 2;
+        }
+
         let this_tank: Tank = tanks[this.tank_id];
         this_tank.time_to_fire = Infinity;
         socket.emit('fire', level - 1);

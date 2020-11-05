@@ -85,5 +85,5 @@ $(function () {
 	$('#virtual-console').val('');
 	set_up_control();
 
-	vt.info('Client loaded. (V1.3b3 +6)');
+	vt.info('Client loaded. (V1.3b3)');
 });
