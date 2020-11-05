@@ -32,7 +32,7 @@ function create_tank(id: string): Tank {
     return {
         pos: get_random_position(),
         blood: 1.0,
-        name: "<unnamed> " + id,
+        name: `unnamed <${id}>`,
         time_to_fire: 0,
         angle: {
             tank: default_angle,
@@ -63,17 +63,18 @@ function check_crash_bullet(this_bullet: Bullet) {
     for (let id in tanks) {
         if (this_bullet.source === id) { continue; }
 
-        let this_tank = tanks[id];
+        let this_tank: Tank = tanks[id];
         if (this_bullet.pos.x >= this_tank.pos.x - Config.tanks.size / 2
             && this_bullet.pos.x <= this_tank.pos.x + Config.tanks.size / 2
             && this_bullet.pos.y >= this_tank.pos.y - Config.tanks.size / 2
             && this_bullet.pos.y <= this_tank.pos.y + Config.tanks.size / 2) {
-            this_tank.blood -= this_bullet_damage;
 
             let source_tank: Tank = tanks[this_bullet.source];
             if (source_tank !== undefined) {
-                source_tank.blood += this_bullet_damage / 5;
+                source_tank.blood += Math.min(this_bullet_damage, this_tank.blood) / 5;
             }
+
+            this_tank.blood -= this_bullet_damage;
 
             return true;
         }
@@ -107,7 +108,7 @@ let tanks = new Object();
 let socket_list = new Array<SocketIO.Socket>();
 
 io.on('connection', (socket: SocketIO.Socket) => {
-    console.log("One tank joined: " + socket.id + "@" + socket.handshake.address);
+    console.log(`One tank joined: ${socket.id} @ ${socket.handshake.address}`);
 
     socket_list[socket.id] = socket;
     let this_tank = create_tank(socket.id);
@@ -121,7 +122,7 @@ io.on('connection', (socket: SocketIO.Socket) => {
 
     socket.on('disconnect', () => {
         delete tanks[socket.id];
-        console.log("Tank " + socket.id + " disconnected.");
+        console.log(`Tank ${socket.id} disconnected.`);
     });
 
     socket.on('turn', (info: { type: string, target: number }) => {
@@ -232,7 +233,7 @@ setInterval(() => {
         }
     }
 
-    io.emit("update", { tanks: tanks, bullets: bullets });
+    io.emit('update', { tanks: tanks, bullets: bullets });
 }, Config.game.update);
 
 app.use('/', Express.static(path.join(__dirname + '../../../../client/')));
