@@ -184,6 +184,10 @@ io.on('connection', (socket: SocketIO.Socket) => {
     socket.on('move', (state: boolean) => { this_tank.is_moving = state; });
 
     socket.on('set-name', (name: string) => { this_tank.name = `${name} < ${socket.id} >`; });
+
+    socket.on('boardcast', (data: any) => {
+        io.emit('boardcast', data);
+    });
 });
 
 

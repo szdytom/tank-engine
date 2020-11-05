@@ -8,11 +8,14 @@ import vt from './vt';
 
 class TankController {
     private tank_id: string
-    on_scan_callback: Function
+    private on_scan_callback: (target: any) => void
+    private on_boardcast_callback: (data: any) => void;
 
     constructor(tank_id: string) {
         this.tank_id = tank_id;
         this.on_scan_callback = () => { this.do_nothing(); };
+        this.on_boardcast_callback = () => { this.do_nothing(); };
+        socket.on('boardcast', (data: any) => { this.on_boardcast_callback(data); });
     }
 
     get_x(): number {
@@ -65,6 +68,10 @@ class TankController {
         return this_tank.blood;
     }
 
+    get_config(): any {
+        return JSON.parse(JSON.stringify(Config));
+    }
+
     can_fire(): boolean {
         let this_tank: Tank = tanks[this.tank_id];
         return this_tank.time_to_fire <= 0;
@@ -113,11 +120,51 @@ class TankController {
         return false;
     }
 
-    on_scan(callback: Function): void {
+    on_scan(callback: (target: any) => void): void {
         this.on_scan_callback = callback;
     }
 
-    _do_scan(): void {
+    on_boardcast(callback: (data: any) => void): void {
+        this.on_boardcast_callback = callback;
+    }
+
+    do_nothing(): void { }
+
+    set_name(name: string): void {
+        socket.emit('set-name', name);
+    }
+
+    loop(callback: () => void): void {
+        setInterval(() => {
+            callback();
+        }, Config.game.update);
+    }
+
+    boardcast(data: any): void {
+        socket.emit('boardcast', data);
+    }
+
+    vt_debug(msg: any): void {
+        vt.debug(msg);
+    }
+
+    vt_info(msg: any): void {
+        vt.info(JSON.stringify(msg));
+    }
+
+    vt_warn(msg: any): void {
+        vt.warn(JSON.stringify(msg));
+    }
+
+    vt_error(msg: any): void {
+        vt.error(JSON.stringify(msg));
+    }
+
+    _tick_update(): void {
+        this._do_scan();
+    }
+
+    private _do_scan(): void {
         let this_tank: Tank = tanks[this.tank_id];
         let radar_angle = this_tank.angle.radar;
         let high_slope = get_line_slope(radar_angle + Config.tanks.radar_size);
@@ -141,38 +188,6 @@ class TankController {
             }
         };
     }
-
-    do_nothing(): void { }
-
-    get_config(): any {
-        return JSON.parse(JSON.stringify(Config));
-    }
-
-    set_name(name: string): void {
-        socket.emit('set-name', name);
-    }
-
-    loop(callback: () => void): void {
-        setInterval(() => {
-            callback();
-        }, Config.game.update);
-    }
-
-    vt_debug(msg: any): void {
-        vt.debug(msg);
-    }
-
-    vt_info(msg: any): void {
-        vt.info(JSON.stringify(msg));
-    }
-
-    vt_warn(msg: any): void {
-        vt.warn(JSON.stringify(msg));
-    }
-
-    vt_error(msg: any): void {
-        vt.error(JSON.stringify(msg));
-    }
 }
 
 let tc: TankController;
@@ -188,7 +203,7 @@ function get_line_slope(d: number): number {
 
 function update_tanks() {
     if (tc === undefined) { return; }
-    tc._do_scan();
+    tc._tick_update();
 }
 
 function start_code(parsed_code: Function) {
