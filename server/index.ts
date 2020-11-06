@@ -4,241 +4,101 @@ import http_server = require('http');
 import path = require('path');
 import axios from 'axios';
 import Config from '../shared/config';
-import Position from '../shared/positions';
-import Tank from '../shared/tanks';
-import Bullet from '../shared/bullet';
+import Position from '../shared/position';
+import { AbstractEquipment, Tank, TurningInfo } from '../shared/equipments';
+import { AbstractShell, FireInfo } from '../shared/shells';
 
-function get_random_position(): Position {
-    let x = (Math.random() * 10000) % Config.space.width;
-    let y = (Math.random() * 10000) % Config.space.height;
-    return { x: x, y: y };
+interface RoomInfo {
+    room_id: string
+    equipments: AbstractEquipment[]
+    shells: AbstractShell[]
 }
 
-function get_random_direction(): number {
-    return (Math.random() * 10000) % 360;
-}
-
-// covert angle to radian
-function covert_degree(x: number): number {
-    return x * Math.PI / 180;
-}
-
-function get_line_slope(d: number): number {
-    return 1 / Math.tan(covert_degree(d));
-}
-
-function create_tank(id: string): Tank {
-    let default_angle = get_random_direction();
+function create_new_room(id: number): RoomInfo {
     return {
-        pos: get_random_position(),
-        blood: 1.0,
-        name: `unnamed < ${id} >`,
-        time_to_fire: 0,
-        angle: {
-            tank: default_angle,
-            gun: default_angle,
-            radar: default_angle,
-        },
-        is_moving: false,
-        id: id,
+        room_id: `Space_${id}`,
+        equipments: new Array<AbstractEquipment>(),
+        shells: new Array<AbstractShell>(),
     };
-}
-
-function create_bullet(tank: Tank, level: number) {
-    let this_bullet: Bullet = {
-        pos: {
-            x: tank.pos.x,
-            y: tank.pos.y,
-        },
-        dire: tank.angle.gun,
-        level: level,
-        source: tank.id,
-    };
-    bullets.push(this_bullet);
-}
-
-function check_crash_bullet(this_bullet: Bullet) {
-    const this_bullet_damage = Config.bullet.damage[this_bullet.level];
-
-    for (let id in tanks) {
-        if (this_bullet.source === id) { continue; }
-
-        let this_tank: Tank = tanks[id];
-        if (this_bullet.pos.x >= this_tank.pos.x - Config.tanks.size / 2
-            && this_bullet.pos.x <= this_tank.pos.x + Config.tanks.size / 2
-            && this_bullet.pos.y >= this_tank.pos.y - Config.tanks.size / 2
-            && this_bullet.pos.y <= this_tank.pos.y + Config.tanks.size / 2) {
-
-            let source_tank: Tank = tanks[this_bullet.source];
-            if (source_tank !== undefined) {
-                source_tank.blood += Math.min(this_bullet_damage, this_tank.blood) / 5;
-            }
-
-            this_tank.blood -= this_bullet_damage;
-
-            return true;
-        }
-    }
-
-    return false;
-}
-
-function check_outof_space(pos: Position) {
-    let half_tank_size = Config.tanks.size / 2;
-
-    if (pos.x < half_tank_size
-        || pos.y < half_tank_size
-        || pos.x > Config.space.width - half_tank_size
-        || pos.y > Config.space.height - half_tank_size) {
-        return true;
-    }
-    return false;
-}
-
-function move_position(pos: Position, angle: number, distance: number) {
-    pos.x += distance * Math.cos(covert_degree(angle));
-    pos.y += distance * Math.sin(covert_degree(angle));
 }
 
 const app = Express();
 const http = new http_server.Server(app);
 const io = new SocketIO(http);
-let bullets = new Array<Bullet>();
-let tanks = new Object();
-let socket_list = new Array<SocketIO.Socket>();
+let rooms = new Array<RoomInfo>();
 
 io.on('connection', (socket: SocketIO.Socket) => {
     console.log(`One tank joined: ${socket.id} @ ${socket.handshake.address}`);
 
-    socket_list[socket.id] = socket;
-    let this_tank = create_tank(socket.id);
-    tanks[socket.id] = this_tank;
-
-    let turning_iid: { tank: NodeJS.Timeout, gun: NodeJS.Timeout, radar: NodeJS.Timeout } = {
-        tank: null,
-        gun: null,
-        radar: null,
-    };
+    let this_equipment: AbstractEquipment = null;
+    let room_id: number = null;
 
     socket.on('disconnect', () => {
-        delete tanks[socket.id];
         console.log(`Tank ${socket.id} disconnected.`);
     });
 
-    socket.on('turn', (info: { type: string, target: number }) => {
-        let target = info.target % 360;
-        if (target < 0) { target += 360; }
+    socket.on('join', (info: { room_id: number, equipment_type: string }) => {
+        if (typeof info.room_id !== 'number' || info.room_id > Config.max_rooms || info.room_id < 0) { return; }
+        room_id = Math.floor(info.room_id);
 
-        let type_id: string = info.type;
+        if (!rooms[room_id]) {
+            rooms[room_id] = create_new_room(room_id);
+        }
 
-        let once_update: number = Config.tanks.turn_speed[type_id];
+        socket.join(rooms[room_id].room_id);
+        if (info.equipment_type === 'Tank') {
+            this_equipment = new Tank(socket.id);
+            rooms[info.room_id].equipments.push(this_equipment);
+        } else {
+            console.warn(`Unknow equipment type ${info.equipment_type}`);
+        }
+    });
 
-        if (once_update >= 360) {
-            this_tank.angle[type_id] = target;
+    socket.on('turn', (info: TurningInfo) => {
+        if (this_equipment === null) { return; }
+        this_equipment.turn_to(info);
+    });
+
+    socket.on('fire', (info: FireInfo) => {
+        if (this_equipment === null) { return; }
+        if (!this_equipment.can_fire()) {
+            this_equipment.blood -= this_equipment.get_fire_too_much_damage();
             return;
         }
 
-        once_update %= 360;
-        if (Math.abs(target - this_tank.angle[type_id]) > 180) {
-            once_update *= -1;
-        }
-
-        if (turning_iid[type_id] != null) {
-            clearInterval(turning_iid[type_id]);
-        }
-
-        turning_iid[type_id] = setInterval(() => {
-            if (this_tank.angle[type_id] == target) {
-                clearInterval(turning_iid[type_id]);
-                turning_iid[type_id] = null;
-                return;
-            }
-
-            if (Math.abs(target - this_tank.angle[type_id]) <= Math.abs(once_update)) {
-                this_tank.angle[type_id] = target;
-            } else {
-                this_tank.angle[type_id] += once_update;
-                this_tank.angle[type_id] %= 360;
-
-                if (this_tank.angle[type_id] < 0) { this_tank.angle[type_id] += 360; }
-            }
-        }, Config.game.update);
+        rooms[room_id].shells.push(AbstractShell.create(info));
     });
 
-    socket.on('fire', (level: number) => {
-        if (this_tank.time_to_fire > 0) {
-            console.log('Fire too much.');
-            this_tank.blood -= Config.tanks.fire_too_much_damage;
-            return;
-        }
+    socket.on('move', (state: boolean) => { this_equipment.is_moving = state; });
 
-        if (typeof level !== 'number' || level > 5 || level < 0) {
-            console.log('Invaild arguments.');
-            return;
-        }
+    socket.on('set-name', (name: string) => { this_equipment.name = `${name} < ${socket.id} >`; });
 
-        this_tank.time_to_fire = Config.tanks.fire_speed[level];
-        create_bullet(this_tank, level);
-    });
-
-    socket.on('move', (state: boolean) => { this_tank.is_moving = state; });
-
-    socket.on('set-name', (name: string) => { this_tank.name = `${name} < ${socket.id} >`; });
-
-    socket.on('boardcast', (data: any) => {
-        io.emit('boardcast', data);
-    });
+    // socket.on('boardcast', (data: any) => {
+    //     io.emit('boardcast', data);
+    // });
 });
 
 
 setInterval(() => {
-    for (let id in bullets) {
-        let this_bullet = bullets[id];
-
-        const move_split_time = 5;
-        for (let i = 1; i <= move_split_time; i += 1) {
-            move_position(this_bullet.pos, this_bullet.dire, Config.bullet.speed / move_split_time);
-            if (check_crash_bullet(this_bullet) || check_outof_space(this_bullet.pos)) {
-                bullets.splice(<number><any>id, 1);
-                break;
+    rooms.forEach((this_room: RoomInfo) => {
+        this_room.shells.forEach((this_shell: AbstractShell, i: number, array: AbstractShell[]) => {
+            if (this_shell.update((): boolean => { return this_shell.check_hit(this_room.equipments); })) {
+                delete array[i];
             }
-        }
-    }
+        });
 
-    for (let id in tanks) {
-        let this_tank: Tank = tanks[id];
+        this_room.equipments.forEach((this_equipemt: AbstractEquipment, i: number, array: AbstractEquipment[]) => {
+            if (this_equipemt.update()) {
+                delete array[i];
+            }
+        });
 
-        if (this_tank.time_to_fire > 0) {
-            this_tank.time_to_fire -= 1;
-        }
-
-        if (this_tank.blood <= 0) {
-            let this_socket: SocketIO.Socket = socket_list[this_tank.id];
-            this_socket.disconnect();
-            delete tanks[id];
-            continue;
-        }
-
-        if (!this_tank.is_moving) {
-            continue;
-        }
-
-        move_position(this_tank.pos, this_tank.angle.tank, Config.tanks.max_speed);
-
-        if (check_outof_space(this_tank.pos)) {
-            this_tank.blood -= Config.tanks.crash_damage;
-
-            let half_tank_size = Config.tanks.size / 2;
-            this_tank.pos.x = Math.min(Config.space.width - half_tank_size, this_tank.pos.x);
-            this_tank.pos.y = Math.min(Config.space.width - half_tank_size, this_tank.pos.y);
-
-            this_tank.pos.x = Math.max(half_tank_size, this_tank.pos.x);
-            this_tank.pos.y = Math.max(half_tank_size, this_tank.pos.y);
-        }
-    }
-
-    io.emit('update', { tanks: tanks, bullets: bullets });
-}, Config.game.update);
+        io.to(this_room.room_id).emit('update', {
+            shells: this_room.shells,
+            equipments: this_room.equipments,
+        });
+    });
+}, Config.tick_speed);
 
 app.use('/', Express.static(path.join(__dirname + '../../../../client/')));
 app.get('/webjs', (req, res) => {

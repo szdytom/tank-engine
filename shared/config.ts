@@ -1,27 +1,30 @@
 const Config = {
-    game: {
-        update: 40,
-    },
+    tick_speed: 40,
+    max_rooms: 10000,
     space: {
         height: 800,
-        width: 1000, 
+        width: 1000,
     },
-    tanks: {
-        max_speed: 5.12,
-        turn_speed: {
-            tank: 7.2,
-            radar: 360,
-            gun: 64.75,
+    shells: {
+        Tank: {
+            speed: 20.48,
+            damage: [1, 20, 25, 75, 98.75],
+            heat: [1, 16, 19, 50, 59],
         },
-        fire_speed: [1, 18, 24, 31, 88, 105],
-        fire_too_much_damage: 0.05,
-        crash_damage: 0.01,
-        size: 50,
-        radar_size: 15,
     },
-    bullet: {
-        damage: [0.01, 0.2, 0.25, 0.35, 0.75, 0.99],
-        speed: 20.48,
+    equipments: {
+        Tanks: {
+            speed: 5,
+            blood: 100,
+            size: 50,
+            crash_wall_damage: 1,
+            turn_speed: {
+                main: 14.8,
+                gun: 56.4,
+                radar: 360,
+            },
+            fire_too_much_damage: 5,
+        },
     },
 };
 
