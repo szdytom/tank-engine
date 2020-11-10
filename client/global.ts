@@ -1,21 +1,26 @@
-import Bullet from "../shared/bullet";
-import Tank from "../shared/tanks";
 import 'socket.io-client';
 
-let bullets: Bullet[];
-let tanks: Tank[];
-let socket: SocketIOClient.Socket;
+class game_runtime_info {
+    private static instance: game_runtime_info
+    shells: any[];
+    equipments: any[];
+    socket: SocketIOClient.Socket;
+    equipments_id_map: Object;
 
-function set_socket(value: SocketIOClient.Socket) {
-    socket = value;
+    get_equipment(id: string): any {
+        console.log(id, this.equipments_id_map[id]);
+        return this.equipments[this.equipments_id_map[id]];
+    }
+
+    private constructor() { }
+
+    static get_instance(): game_runtime_info {
+        if (!this.instance) {
+            this.instance = new game_runtime_info();
+        }
+
+        return this.instance;
+    }
 }
 
-function set_tanks(value: Tank[]) {
-    tanks = value;
-}
-
-function set_bullets(value: Bullet[]) {
-    bullets = value
-}
-
-export {bullets, tanks, socket, set_bullets, set_socket, set_tanks};
+export default game_runtime_info;

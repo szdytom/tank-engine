@@ -1,12 +1,12 @@
 import $ = require('jquery');
 import io = require('socket.io-client');
-import ui from './ui';
 import Config from '../shared/config';
-import { set_up_control, start_code, update_tanks } from './api';
-import { bullets, set_bullets, set_socket, set_tanks, tanks, socket } from './global';
-import Tank from '../shared/tanks';
-import Bullet from '../shared/bullet';
+import { set_up_control, start_code, update_equipments } from './api';
+import game_runtime_info from './global';
+import ui from './ui';
 import vt from './vt';
+
+let gre = game_runtime_info.get_instance();
 
 function start_by_code(code: string) {
 	$('#stop-button').removeAttr('disabled');
@@ -15,38 +15,53 @@ function start_by_code(code: string) {
 	$('#run-control').css('display', 'block');
 
 	let server_url: string = '/';
-	let code_loaded: boolean = false;
-	let load_tank_code = new Promise((resolve) => {
-		let iid = setInterval(() => {
-			if (code_loaded) {
-				clearInterval(iid);
-				resolve(void(0));
-			}
-		}, Config.game.update)
+
+	gre.socket = io(server_url, {
+		reconnection: false,
+		reconnectionAttempts: 0,
 	});
 
-	set_socket(io(server_url));
-	socket.on('connection', function () {
+	console.log(1, gre.socket);
+
+	gre.socket.on('connect', function () {
 		vt.info('Connected.');
+
+		let can_load_control_code: boolean = false;
+		let load_control_code: Promise<void> = new Promise((resolve) => {
+			let iid = setInterval(() => {
+				if (can_load_control_code) {
+					clearInterval(iid);
+					resolve();
+				}
+			}, Config.tick_speed);
+		});
+
+		gre.socket.on('update', function (info: { shells: any[], equipments: any[], map: Object }) {
+			gre.equipments = info.equipments;
+			gre.shells = info.shells;
+			gre.equipments_id_map = info.map;
+			can_load_control_code = true;
+			ui();
+			update_equipments();
+		});
+
+		gre.socket.on('equipemt-destory', function () {
+			vt.info('Your equipment was destroyed.');
+			gre.socket.disconnect();
+		});
+
+		let parsed_code = new Function('tk', code);
+
+		start_code(parsed_code, load_control_code);
 	});
 
-	socket.on('disconnect', function () {
-		vt.info('Disconnected. You are killed.');
+	gre.socket.on('disconnect', function () {
+		vt.warn('Disconnected.');
 		on_stop();
 	});
 
-	socket.on('update', function (info: {tanks: Tank[], bullets: Bullet[]}) {
-		set_tanks(info.tanks);
-		set_bullets(info.bullets);
-		ui();
-		update_tanks();
-		code_loaded = true;
-	});
-
-	let parsed_code = new Function('tk', '$', code);
-	load_tank_code.then(() => {
-		vt.info('Tank control codes loaded.');
-		start_code(parsed_code);
+	gre.socket.on('connect_error', () => {
+		vt.error('Error while connecting to server.');
 	});
 }
 
@@ -54,7 +69,7 @@ function start() {
 	let code: string = $('#code').val().toString();
 	if (code.startsWith('http')) {
 		// is an URL
-		$.get('/webjs', {url: code}, (web_code: string): void => {
+		$.get('/webjs', { url: code }, (web_code: string): void => {
 			start_by_code(web_code);
 		});
 	} else {
@@ -63,27 +78,27 @@ function start() {
 }
 
 function stop() {
-	socket.disconnect();
+	gre.socket.disconnect();
 	on_stop();
 }
 
 function on_stop() {
-	$('#stop-button').attr("disabled", "true");
+	$('#stop-button').attr('disabled', 'true');
 	$('#code').css('display', 'inline');
 }
 
 $(function () {
-	console.log("Init");
+	console.log('Init');
 
 	$('#run-control').css('display', 'none');
-	
+
 	$('#start-button').on('click', start);
 	$('#stop-button').on('click', stop);
-	
-	$('#stop-button').attr("disabled", "true");
-	
+
+	$('#stop-button').attr('disabled', 'true');
+
 	$('#virtual-console').val('');
 	set_up_control();
 
-	vt.info('Client loaded. (V1.3.4)');
+	vt.info('Tank Engine (V2.0a2) client loaded.');
 });

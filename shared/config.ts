@@ -16,14 +16,18 @@ const Config = {
         Tanks: {
             speed: 5,
             blood: 100,
+            
             size: 50,
+            radar_size: 30,
+
             crash_wall_damage: 1,
+            fire_too_much_damage: 5,
+            
             turn_speed: {
                 main: 14.8,
                 gun: 56.4,
                 radar: 360,
             },
-            fire_too_much_damage: 5,
         },
     },
 };

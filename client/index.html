@@ -24,10 +24,16 @@
                 <button id="ctr-tk-fire">Fire</button>
                 <button id="ctr-tk-move">Start Move</button>
                 <button id="ctr-tk-stop">Stop Move</button> <br />
-                <textarea id="virtual-console" readonly></textarea>
             </div>
 
-            <textarea id="code" autocomplete="off" spellcheck="false" placeholder="Paste your code or code URL here..."></textarea>
+            <textarea id="virtual-console" readonly></textarea>
+            <input id="room-id" type="number" min="0" max="10000" placeholder="Room ID here..." value="0"
+                autocomplete="off" required />
+            <select id="equipment-type" required>
+                <option value="Tank" selected>Tank</option>
+            </select>
+            <textarea id="code" autocomplete="off" spellcheck="false"
+                placeholder="Paste your code or code URL here..."></textarea>
 
             <button class="bottom_button" id="start-button">Start</button>
             <button class="bottom_button" id="stop-button">Resign</button>
@@ -113,6 +119,11 @@
         #virtual-console {
             width: 100%;
             min-height: 150px;
+            resize: none;
+        }
+
+        #room-id {
+            width: auto;
         }
     </style>
 </body>

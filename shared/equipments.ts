@@ -22,17 +22,22 @@ abstract class AbstractEquipment {
     blood: number
     name: string
     id: string
+    time_to_fire: number
 
     private turning_iid: AngleInfo
 
-    constructor(type: string) {
+    constructor(type: string, id: string) {
         this.type = type;
+        this.id = id;
+        this.name = `unnamed < ${id} >`;
+
         this.is_moving = false;
         this.turning_iid = {
             main: null,
             gun: null,
             radar: null,
         };
+        this.time_to_fire = 0;
     }
 
     get_speed(): number { return undefined; }
@@ -103,6 +108,7 @@ abstract class AbstractEquipment {
     }
 
     can_fire(): boolean { return true; }
+    set_name(name: string) { this.name = `${name} < ${this.id} >`; }
 
     protected update_move() {
         this.pos.update(this.angle.main, this.get_speed());
@@ -134,14 +140,8 @@ abstract class AbstractEquipment {
 }
 
 class Tank extends AbstractEquipment {
-    time_to_fire: number
-
     constructor(id: string) {
-        super('Tank');
-
-        this.id = id;
-        this.time_to_fire = 0;
-        this.name = `unnamed < ${id} >`;
+        super('Tanks', id);
         this.blood = Config.equipments.Tanks.blood;
         this.pos = new Position(get_random_position());
 

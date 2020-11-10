@@ -15,8 +15,13 @@ function get_random_position(): { x: number, y: number } {
     };
 }
 
+function get_line_slope(d: number): number {
+    return 1 / Math.tan(covert_degree(d));
+}
+
 export {
     covert_degree,
     get_random_direction,
     get_random_position,
+    get_line_slope
 };

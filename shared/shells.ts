@@ -4,14 +4,18 @@ import { AbstractEquipment } from './equipments';
 
 interface FireInfo {
     type: string
-    level: number
     angle: number
     source: AbstractEquipment
+    data: {
+        level: number
+        x: number
+        y: number
+    }
 }
 
 abstract class AbstractShell {
     static create(info: FireInfo): AbstractShell {
-        if (info.type === 'tank') {
+        if (info.type === 'TankShell') {
             return new TankShell(info);
         }
         console.warn(`Invaild shell type ${info.type}.`);
@@ -24,8 +28,13 @@ abstract class AbstractShell {
     pos: Position
     angle: number
 
-    constructor(type: string) {
+    constructor(type: string, info?: FireInfo) {
         this.type = type;
+
+        if (!info) { return; }
+        this.source = info.source;
+        this.angle = info.angle;
+        this.pos = this.source.pos.clone();
     }
 
     get_speed(): number { return undefined; }
@@ -74,13 +83,9 @@ class TankShell extends AbstractShell {
     private level: number
 
     constructor(info: FireInfo) {
-        super('TankShell');
+        super('TankShell', info);
 
-        this.level = info.level;
-        this.source = info.source;
-
-        this.angle = info.angle;
-        this.pos = this.source.pos.clone();
+        this.level = info.data.level;
     }
 
     get_heat(): number { return Config.shells.Tank.heat[this.level]; }

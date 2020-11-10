@@ -1,71 +1,59 @@
-import Tank from '../shared/tanks';
-import Config from '../shared/config';
-import 'socket.io-client';
-import { tanks, socket } from './global';
-import Position from '../shared/positions';
 import $ = require('jquery');
-import vt from './vt';
+import 'socket.io-client';
 
-class TankController {
-    private tank_id: string
+import vt from './vt';
+import Config from '../shared/config';
+import Position from '../shared/position';
+import game_runtime_info from './global';
+import { get_line_slope } from '../shared/Lfunctions';
+
+let gre = game_runtime_info.get_instance();
+
+class EquipmentController {
+    private equipment_id: string
     private on_scan_callback: (target: any) => void
     private on_boardcast_callback: (data: any) => void;
 
-    constructor(tank_id: string) {
-        this.tank_id = tank_id;
+    constructor(equipment_id: string) {
+        this.equipment_id = equipment_id;
         this.on_scan_callback = () => { this.do_nothing(); };
         this.on_boardcast_callback = () => { this.do_nothing(); };
-        socket.on('boardcast', (data: any) => { this.on_boardcast_callback(data); });
+        gre.socket.on('boardcast', (data: any) => { this.on_boardcast_callback(data); });
     }
 
     get_x(): number {
-        let this_tank: Tank = tanks[this.tank_id];
-        return this_tank.pos.x;
+        let this_equipment = gre.get_equipment(this.equipment_id);
+        return this_equipment.pos.x;
     }
 
     get_y(): number {
-        let this_tank: Tank = tanks[this.tank_id];
-        return this_tank.pos.y;
+        let this_equipment = gre.get_equipment(this.equipment_id);
+        return this_equipment.pos.y;
     }
 
     get_pos(): Position {
-        let this_tank: Tank = tanks[this.tank_id];
-        return this_tank.pos;
+        let this_equipment = gre.get_equipment(this.equipment_id);
+        return this_equipment.pos;
     }
 
     get_angle(): number {
-        let this_tank: Tank = tanks[this.tank_id];
-        return this_tank.angle.tank;
+        let this_equipment = gre.get_equipment(this.equipment_id);
+        return this_equipment.angle.main;
     }
 
     get_gun_angle(): number {
-        let this_tank: Tank = tanks[this.tank_id];
-        return this_tank.angle.gun;
+        let this_equipment = gre.get_equipment(this.equipment_id);
+        return this_equipment.angle.gun;
     }
 
     get_radar_angle(): number {
-        let this_tank: Tank = tanks[this.tank_id];
-        return this_tank.angle.radar;
-    }
-
-    get_direction(): number {
-        vt.warn('Function get_direction() is deprecated. Please use get_angle() instead.');
-        return this.get_angle();
-    }
-
-    get_gun_direction(): number {
-        vt.warn('Function get_gun_direction() is deprecated. Please use get_gun_angle() instead.');
-        return this.get_gun_angle();
-    }
-
-    get_radar_direction(): number {
-        vt.warn('Function get_radar_direction() is deprecated. Please use get_radar_angle() instead.');
-        return this.get_radar_angle();
+        let this_equipment = gre.get_equipment(this.equipment_id);
+        return this_equipment.angle.radar;
     }
 
     get_blood(): number {
-        let this_tank: Tank = tanks[this.tank_id];
-        return this_tank.blood;
+        let this_equipment = gre.get_equipment(this.equipment_id);
+        return this_equipment.blood;
     }
 
     get_config(): any {
@@ -73,8 +61,12 @@ class TankController {
     }
 
     can_fire(): boolean {
-        let this_tank: Tank = tanks[this.tank_id];
-        return this_tank.time_to_fire <= 0;
+        let this_equipment = gre.get_equipment(this.equipment_id);
+        if (!this_equipment.time_to_fire) {
+            return true;
+        }
+
+        return this_equipment.time_to_fire <= 0;
     }
 
     fire(level?: number): void {
@@ -82,41 +74,46 @@ class TankController {
             level = 2;
         }
 
-        let this_tank: Tank = tanks[this.tank_id];
-        this_tank.time_to_fire = Infinity;
-        socket.emit('fire', level - 1);
+        let this_equipment = gre.get_equipment(this.equipment_id);
+        this_equipment.time_to_fire = Infinity;
+        gre.socket.emit('fire', {
+            type: 'TankShell',
+            level: level - 1,
+        });
     }
 
     turn_to(target: number): void {
-        socket.emit('turn', {
-            type: 'tank',
+        gre.socket.emit('turn', {
+            type: 'main',
             target: target,
         });
     }
 
     turn_gun_to(target: number): void {
-        socket.emit('turn', {
+        gre.socket.emit('turn', {
             type: 'gun',
             target: target,
         });
     }
 
     turn_radar_to(target: number): void {
-        socket.emit('turn', {
+       gre. socket.emit('turn', {
             type: 'radar',
             target: target,
         });
     }
 
     move(): boolean {
-        if (tanks[this.tank_id].is_moving) { return false; }
-        socket.emit("move", true);
+        let this_equipment = gre.get_equipment(this.equipment_id); 
+        if (this_equipment.is_moving) { return false; }
+        gre.socket.emit("move", true);
         return true;
     }
 
     stop(): boolean {
-        if (!tanks[this.tank_id].is_moving) { return false; }
-        socket.emit('move', false);
+        let this_equipment = gre.get_equipment(this.equipment_id);
+        if (!this_equipment.is_moving) { return false; }
+        gre.socket.emit('move', false);
         return false;
     }
 
@@ -131,17 +128,11 @@ class TankController {
     do_nothing(): void { }
 
     set_name(name: string): void {
-        socket.emit('set-name', name);
-    }
-
-    loop(callback: () => void): void {
-        setInterval(() => {
-            callback();
-        }, Config.game.update);
+        gre.socket.emit('set-name', name);
     }
 
     boardcast(data: any): void {
-        socket.emit('boardcast', data);
+        gre.socket.emit('boardcast', data);
     }
 
     vt_debug(msg: any): void {
@@ -165,51 +156,54 @@ class TankController {
     }
 
     private _do_scan(): void {
-        let this_tank: Tank = tanks[this.tank_id];
-        let radar_angle = this_tank.angle.radar;
-        let high_slope = get_line_slope(radar_angle + Config.tanks.radar_size);
-        let low_slope = get_line_slope(radar_angle - Config.tanks.radar_size);
+        let this_equipment = gre.get_equipment(this.equipment_id);
+
+        let half_radar_size: number = Config.equipments[this_equipment.type].radar_size / 2;
+
+        let radar_angle = this_equipment.angle.radar;
+        let high_slope = get_line_slope(radar_angle + half_radar_size);
+        let low_slope = get_line_slope(radar_angle - half_radar_size);
         let upper_slope = Math.min(high_slope, low_slope);
         let lower_slope = Math.max(high_slope, low_slope);
-        for (let id in tanks) {
-            let element = tanks[id];
-            if (element.id == this.tank_id) { continue; }
+        gre.equipments.forEach((target_equipment) => {
+            if (target_equipment.id == this.equipment_id) { return; }
 
-            let target_slope = (element.pos.x - this_tank.pos.x) / (element.pos.y - this_tank.pos.y);
+            let target_slope = (target_equipment.pos.x - this_equipment.pos.x) / (target_equipment.pos.y - this_equipment.pos.y);
             if (upper_slope <= target_slope && target_slope <= lower_slope) {
                 // scanned
                 this.on_scan_callback({
-                    x: element.pos.x,
-                    y: element.pos.y,
-                    blood: element.blood,
-                    is_moving: element.is_moving,
-                    name: element.name,
+                    x: target_equipment.pos.x,
+                    y: target_equipment.pos.y,
+                    blood: target_equipment.blood,
+                    is_moving: target_equipment.is_moving,
+                    name: target_equipment.name,
                 });
             }
-        };
+        });
     }
 }
 
-let tc: TankController;
+let ec: EquipmentController = null;
 
-// covert angle to radian
-function covert_degree(x: number): number {
-    return x * Math.PI / 180;
+function update_equipments() {
+    if (ec) { ec._tick_update(); }
 }
 
-function get_line_slope(d: number): number {
-    return 1 / Math.tan(covert_degree(d));
-}
+function start_code(parsed_code: Function, load_control_code: Promise<void>) {
+    console.log(10, gre.socket);
 
-function update_tanks() {
-    if (tc === undefined) { return; }
-    tc._tick_update();
-}
+    let room_id: number = parseInt($('#room-id').val().toString());
+    let equipment_type: string = <string>$('#equipment-type').val();
 
-function start_code(parsed_code: Function) {
-    tc = new TankController(socket.id);
-    let custom_var = {};
-    parsed_code(tc, custom_var);
+    vt.info(`Joining room ${room_id} as ${equipment_type}`);
+    gre.socket.emit('join-space', { room_id: room_id, equipment_type: equipment_type });
+
+    ec = new EquipmentController(gre.socket.id);
+
+    load_control_code.then(() => {
+        vt.info('Equipment control codes loaded.');
+        parsed_code(ec);
+    });
 }
 
 function set_up_control() {
@@ -218,13 +212,13 @@ function set_up_control() {
         setTimeout(() => { element.removeAttr('disabled'); }, 5000);
     }
 
-    $('#ctr-tk-fire').on('click', () => { tc.fire(2); set_disable($('#ctr-tk-fire')); });
-    $('#ctr-tk-move').on('click', () => { tc.move(); set_disable($('#ctr-tk-move')); });
-    $('#ctr-tk-stop').on('click', () => { tc.stop(); set_disable($('#ctr-tk-stop')); });
+    $('#ctr-tk-fire').on('click', () => { ec.fire(2); set_disable($('#ctr-tk-fire')); });
+    $('#ctr-tk-move').on('click', () => { ec.move(); set_disable($('#ctr-tk-move')); });
+    $('#ctr-tk-stop').on('click', () => { ec.stop(); set_disable($('#ctr-tk-stop')); });
 }
 
 export {
     start_code,
-    update_tanks,
+    update_equipments,
     set_up_control,
 };
