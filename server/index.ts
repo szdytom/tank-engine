@@ -21,6 +21,12 @@ function create_new_room(id: number): RoomInfo {
     };
 }
 
+function is_bad_equipment(this_equipment: AbstractEquipment): boolean {
+    if (this_equipment == null) { return true; }
+    if (this_equipment.blood <= 0) { return true; }
+    return false;
+}
+
 const app = Express();
 const http = new http_server.Server(app);
 const io = new SocketIO(http);
@@ -34,7 +40,7 @@ io.on('connect', (socket: SocketIO.Socket) => {
 
     socket.on('disconnect', () => {
         console.log(`Client ${socket.id} disconnected.`);
-        if (this_equipment == null) { return; }
+        if (is_bad_equipment(this_equipment)) { return; }
         this_equipment.blood = -Infinity;
     });
 
@@ -61,12 +67,12 @@ io.on('connect', (socket: SocketIO.Socket) => {
     });
 
     socket.on('turn', (info: TurningInfo) => {
-        if (this_equipment == null) { return; }
+        if (is_bad_equipment(this_equipment)) { return; }
         this_equipment.turn_to(info);
     });
 
     socket.on('fire', (info: FireInfo) => {
-        if (this_equipment == null) { return; }
+        if (is_bad_equipment(this_equipment)) { return; }
         if (!this_equipment.can_fire()) {
             this_equipment.blood -= this_equipment.get_fire_too_much_damage();
             return;
@@ -81,17 +87,17 @@ io.on('connect', (socket: SocketIO.Socket) => {
     });
 
     socket.on('move', (state: boolean) => {
-        if (this_equipment == null) { return; }
+        if (is_bad_equipment(this_equipment)) { return; }
         this_equipment.is_moving = state;
     });
 
     socket.on('set-name', (name: string) => {
-        if (this_equipment == null) { return; };
+        if (is_bad_equipment(this_equipment)) { return; };
         this_equipment.set_name(name);
     });
 
     socket.on('boardcast', (data: any) => {
-        if (this_equipment == null) { return; }
+        if (is_bad_equipment(this_equipment)) { return; }
         socket.to(rooms[room_id].room_id).broadcast.emit('boardcast', data);
     });
 });
@@ -111,7 +117,7 @@ setInterval(() => {
             if (this_equipemt.update()) {
                 console.log(`Equipment ${this_equipemt.id} was destroyed.`);
                 io.to(this_equipemt.id).emit('equipemt-destory');
-                io.to(this_equipemt.id).removeAllListeners();
+                this_equipemt.blood = -Infinity;
                 delete array[i];
                 return;
             }

@@ -69,16 +69,14 @@ class EquipmentController {
         return this_equipment.time_to_fire <= 0;
     }
 
-    fire(level?: number): void {
-        if (!level) {
-            level = 2;
-        }
-
+    fire(level: number): void {
         let this_equipment = gre.get_equipment(this.equipment_id);
         this_equipment.time_to_fire = Infinity;
         gre.socket.emit('fire', {
             type: 'TankShell',
-            level: level - 1,
+            data: {
+                level: level,
+            },
         });
     }
 
@@ -190,8 +188,6 @@ function update_equipments() {
 }
 
 function start_code(parsed_code: Function, load_control_code: Promise<void>) {
-    console.log(10, gre.socket);
-
     let room_id: number = parseInt($('#room-id').val().toString());
     let equipment_type: string = <string>$('#equipment-type').val();
 

@@ -8,7 +8,6 @@ class game_runtime_info {
     equipments_id_map: Object;
 
     get_equipment(id: string): any {
-        console.log(id, this.equipments_id_map[id]);
         return this.equipments[this.equipments_id_map[id]];
     }
 

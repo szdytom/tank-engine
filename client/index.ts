@@ -8,6 +8,14 @@ import vt from './vt';
 
 let gre = game_runtime_info.get_instance();
 
+function clean_array_null<T>(a: Array<T>) {
+	a.forEach((element, id, array) => {
+		if (element === null || element === undefined) {
+			delete array[id];
+		}
+	});
+}
+
 function start_by_code(code: string) {
 	$('#stop-button').removeAttr('disabled');
 	$('#start-button').attr('disabled', 'true');
@@ -20,8 +28,6 @@ function start_by_code(code: string) {
 		reconnection: false,
 		reconnectionAttempts: 0,
 	});
-
-	console.log(1, gre.socket);
 
 	gre.socket.on('connect', function () {
 		vt.info('Connected.');
@@ -38,7 +44,11 @@ function start_by_code(code: string) {
 
 		gre.socket.on('update', function (info: { shells: any[], equipments: any[], map: Object }) {
 			gre.equipments = info.equipments;
+			clean_array_null(gre.equipments);
+
 			gre.shells = info.shells;
+			clean_array_null(gre.shells);
+
 			gre.equipments_id_map = info.map;
 			can_load_control_code = true;
 			ui();
