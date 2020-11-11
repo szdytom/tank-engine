@@ -172,7 +172,7 @@ class Tank extends AbstractEquipment {
 
                 if (this.angle[type_id] < 0) { this.angle[type_id] += 360; }
             }
-        }, Config.tick_speed);
+        }, Config.tick_speed)[Symbol.toPrimitive];
     }
 }
 
