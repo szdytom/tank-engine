@@ -29,7 +29,7 @@ function is_bad_equipment(this_equipment: AbstractEquipment): boolean {
 
 const app = Express();
 const http = new http_server.Server(app);
-const io = new SocketIO(http);
+const io = new SocketIO.Server(http);
 let rooms = new Array<RoomInfo>();
 
 io.on('connect', (socket: SocketIO.Socket) => {
@@ -133,7 +133,7 @@ setInterval(() => {
     });
 }, Config.tick_speed);
 
-app.use('/', Express.static(path.join(__dirname + '../../../../client/')));
+app.use('/', Express.static(path.join(__dirname, '../client')));
 app.get('/webjs', (req, res) => {
     let url: string = req.query.url.toString();
     console.log(`Web JS Fetch: ${url}`);

@@ -1,5 +1,6 @@
 import Position from './position';
 import Config from './config';
+import { addTimeout, stopTimeout } from './timeout-id';
 import { get_random_direction, get_random_position } from './Lfunctions';
 
 interface TurningInfo {
@@ -154,12 +155,12 @@ class Tank extends AbstractEquipment {
         }
 
         if (this.turning_iid[type_id] !== null) {
-            clearInterval(this.turning_iid[type_id]);
+            stopTimeout(this.turning_iid[type_id]);
         }
 
-        this.turning_iid[type_id] = setInterval(() => {
+        this.turning_iid[type_id] = addTimeout(setInterval((): void => {
             if (this.angle[type_id] === target) {
-                clearInterval(this.turning_iid[type_id]);
+                stopTimeout(this.turning_iid[type_id]);
                 this.turning_iid[type_id] = null;
                 return;
             }
@@ -172,7 +173,7 @@ class Tank extends AbstractEquipment {
 
                 if (this.angle[type_id] < 0) { this.angle[type_id] += 360; }
             }
-        }, Config.tick_speed)[Symbol.toPrimitive];
+        }, Config.tick_speed));
     }
 }
 
