@@ -66,9 +66,9 @@ abstract class AbstractEquipment {
         let target = info.target % 360;
         if (target < 0) { target += 360; }
 
-        let type_id: string;
+        let type_id: string = info.type;
 
-        if (!['main', 'gun', 'radar'].includes(info.type)) {
+        if (!['main', 'gun', 'radar'].includes(type_id)) {
             console.warn(`Invailed turning type ${info.type} for Tank.`);
             return;
         }
@@ -90,7 +90,7 @@ abstract class AbstractEquipment {
         }
 
         this.turning_iid[type_id] = setInterval(() => {
-            if (this.angle[type_id] == target) {
+            if (this.angle[type_id] === target) {
                 clearInterval(this.turning_iid[type_id]);
                 this.turning_iid[type_id] = null;
                 return;

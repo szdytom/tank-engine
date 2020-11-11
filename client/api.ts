@@ -95,14 +95,14 @@ class EquipmentController {
     }
 
     turn_radar_to(target: number): void {
-       gre. socket.emit('turn', {
+        gre.socket.emit('turn', {
             type: 'radar',
             target: target,
         });
     }
 
     move(): boolean {
-        let this_equipment = gre.get_equipment(this.equipment_id); 
+        let this_equipment = gre.get_equipment(this.equipment_id);
         if (this_equipment.is_moving) { return false; }
         gre.socket.emit("move", true);
         return true;
