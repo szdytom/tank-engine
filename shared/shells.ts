@@ -16,11 +16,14 @@ interface FireInfo {
 abstract class AbstractShell {
     static create(info: FireInfo): AbstractShell {
         if (info.type === 'TankShell') {
-            return new TankShell(info);
+            if (TankShell.is_valid_info(info)) { return new TankShell(info); }
+            else { return new NoShell() }
         }
         console.warn(`Invaild shell type ${info.type}.`);
         return new NoShell();
     }
+
+    static is_valid_info(_info: FireInfo): boolean { return true; }
 
     readonly type: string
 
@@ -80,6 +83,13 @@ abstract class AbstractShell {
 }
 
 class TankShell extends AbstractShell {
+    static is_valid_info(info: FireInfo): boolean {
+        let level = info.data.level;
+        if (typeof (level) !== 'number') { return false; }
+        if (level < 0 || level > Config.shells.Tank.damage.length) { return false; }
+        return true;
+    }
+
     private level: number
 
     constructor(info: FireInfo) {
