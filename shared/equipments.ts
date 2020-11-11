@@ -24,7 +24,7 @@ abstract class AbstractEquipment {
     id: string
     time_to_fire: number
 
-    private turning_iid: AngleInfo
+    protected turning_iid: AngleInfo
 
     constructor(type: string, id: string) {
         this.type = type;
@@ -63,48 +63,15 @@ abstract class AbstractEquipment {
     }
 
     turn_to(info: TurningInfo): void {
-        let target = info.target % 360;
-        if (target < 0) { target += 360; }
+        info.target %= 360;
+        if (info.target < 0) { info.target += 360; }
 
-        let type_id: string = info.type;
-
-        if (!['main', 'gun', 'radar'].includes(type_id)) {
-            console.warn(`Invailed turning type ${info.type} for Tank.`);
+        if (!['main', 'gun', 'radar'].includes(info.type)) {
+            console.warn(`Invailed turning type ${info.type} for this equipment.`);
             return;
         }
 
-        let once_update: number = Config.equipments.Tanks.turn_speed[type_id];
-
-        if (once_update >= 360) {
-            this.angle[type_id] = target;
-            return;
-        }
-
-        once_update %= 360;
-        if (Math.abs(target - this.angle[type_id]) > 180) {
-            once_update *= -1;
-        }
-
-        if (this.turning_iid[type_id] !== null) {
-            clearInterval(this.turning_iid[type_id]);
-        }
-
-        this.turning_iid[type_id] = setInterval(() => {
-            if (this.angle[type_id] === target) {
-                clearInterval(this.turning_iid[type_id]);
-                this.turning_iid[type_id] = null;
-                return;
-            }
-
-            if (Math.abs(target - this.angle[type_id]) <= Math.abs(once_update)) {
-                this.angle[type_id] = target;
-            } else {
-                this.angle[type_id] += once_update;
-                this.angle[type_id] %= 360;
-
-                if (this.angle[type_id] < 0) { this.angle[type_id] += 360; }
-            }
-        }, Config.tick_speed);
+        this.angle[info.type] = info.target;
     }
 
     can_fire(): boolean { return true; }
@@ -161,6 +128,51 @@ class Tank extends AbstractEquipment {
     update(): boolean {
         if (this.time_to_fire > 0) { this.time_to_fire -= 1; }
         return super.update();
+    }
+
+    turn_to(info: TurningInfo): void {
+        let target = info.target % 360;
+        if (target < 0) { target += 360; }
+
+        let type_id: string = info.type;
+
+        if (!['main', 'gun', 'radar'].includes(type_id)) {
+            console.warn(`Invailed turning type ${info.type} for Tank.`);
+            return;
+        }
+
+        let once_update: number = Config.equipments.Tanks.turn_speed[type_id];
+
+        if (once_update >= 360) {
+            this.angle[type_id] = target;
+            return;
+        }
+
+        once_update %= 360;
+        if (Math.abs(target - this.angle[type_id]) > 180) {
+            once_update *= -1;
+        }
+
+        if (this.turning_iid[type_id] !== null) {
+            clearInterval(this.turning_iid[type_id]);
+        }
+
+        this.turning_iid[type_id] = setInterval(() => {
+            if (this.angle[type_id] === target) {
+                clearInterval(this.turning_iid[type_id]);
+                this.turning_iid[type_id] = null;
+                return;
+            }
+
+            if (Math.abs(target - this.angle[type_id]) <= Math.abs(once_update)) {
+                this.angle[type_id] = target;
+            } else {
+                this.angle[type_id] += once_update;
+                this.angle[type_id] %= 360;
+
+                if (this.angle[type_id] < 0) { this.angle[type_id] += 360; }
+            }
+        }, Config.tick_speed);
     }
 }
 
