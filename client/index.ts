@@ -55,7 +55,7 @@ function start_by_code(code: string) {
 			update_equipments();
 		});
 
-		gre.socket.on('equipemt-destory', function () {
+		gre.socket.on('equipment-destroy', function () {
 			vt.info('Your equipment was destroyed.');
 			gre.socket.disconnect();
 		});

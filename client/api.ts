@@ -12,13 +12,13 @@ let gre = game_runtime_info.get_instance();
 class EquipmentController {
     private equipment_id: string
     private on_scan_callback: (target: any) => void
-    private on_boardcast_callback: (data: any) => void;
+    private on_broadcast_callback: (data: any) => void;
 
     constructor(equipment_id: string) {
         this.equipment_id = equipment_id;
         this.on_scan_callback = () => { this.do_nothing(); };
-        this.on_boardcast_callback = () => { this.do_nothing(); };
-        gre.socket.on('boardcast', (data: any) => { this.on_boardcast_callback(data); });
+        this.on_broadcast_callback = () => { this.do_nothing(); };
+        gre.socket.on('broadcast', (data: any) => { this.on_broadcast_callback(data); });
     }
 
     get_x(): number {
@@ -122,8 +122,8 @@ class EquipmentController {
         this.on_scan_callback = callback;
     }
 
-    on_boardcast(callback: (data: any) => void): void {
-        this.on_boardcast_callback = callback;
+    on_broadcast(callback: (data: any) => void): void {
+        this.on_broadcast_callback = callback;
     }
 
     do_nothing(): void { }
@@ -132,8 +132,8 @@ class EquipmentController {
         gre.socket.emit('set-name', name);
     }
 
-    boardcast(data: any): void {
-        gre.socket.emit('boardcast', data);
+    broadcast(data: any): void {
+        gre.socket.emit('broadcast', data);
     }
 
     vt_debug(msg: any): void {

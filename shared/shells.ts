@@ -22,8 +22,8 @@ abstract class AbstractShell {
             if (AntiTankMineShell.is_valid_info(info)) { return new AntiTankMineShell(info); }
             else { return new NoShell() }
         }
-
-        console.warn(`Invaild shell type ${info.type}.`);
+      
+        console.warn(`Invalid shell type ${info.type}.`);
         return new NoShell();
     }
 

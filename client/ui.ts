@@ -24,17 +24,17 @@ export default function () {
         if (this_shell.type === 'TankShell') {
             ctx.fillStyle = 'brown';
             ctx.fillRect(
-                Math.floor(this_shell.pos.x - bullect_draw_size / 2),
-                Math.floor(this_shell.pos.y - bullect_draw_size / 2),
-                bullect_draw_size,
-                bullect_draw_size);
+                Math.floor(this_shell.pos.x - shell_draw_size / 2),
+                Math.floor(this_shell.pos.y - shell_draw_size / 2),
+                shell_draw_size,
+                shell_draw_size);
         } else if (this_shell.type === 'AntiTankMineShell') {
             ctx.fillStyle = 'blue';
-            ctx.fillRect(
-                Math.floor(this_shell.pos.x - bullect_draw_size / 2),
-                Math.floor(this_shell.pos.y - bullect_draw_size / 2),
-                bullect_draw_size,
-                bullect_draw_size);
+            ctx.strokeRect(
+                Math.floor(this_shell.pos.x - shell_draw_size / 2),
+                Math.floor(this_shell.pos.y - shell_draw_size / 2),
+                shell_draw_size,
+                shell_draw_size);
         }
     });
 
