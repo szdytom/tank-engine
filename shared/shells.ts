@@ -66,7 +66,6 @@ abstract class AbstractShell {
             if (target_tank.blood <= 0) { return; }
 
             if (target_tank.check_hit(this.pos)) {
-                console.log(`Hit damage ${this.get_damage()}.`);
                 this.source.blood += Math.min(this.get_damage(), target_tank.blood) / 4;
                 target_tank.blood -= this.get_damage();
 

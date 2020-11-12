@@ -97,7 +97,6 @@ function start(): void {
 	} else {
 		get_code_from_file()
 			.then((code): void => {
-				console.log(code);
 				start_by_code(code);
 			});
 	}

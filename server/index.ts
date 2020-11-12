@@ -110,7 +110,6 @@ setInterval((): void => {
         this_room.shells.forEach((this_shell: AbstractShell, i: number): void => {
             if (this_shell.update((): boolean => { return this_shell.check_hit(this_room.equipments); })) {
                 delete this_room.shells[i];
-                console.log(`Shell ${i} has been deleted`);
                 return;
             }
         });
