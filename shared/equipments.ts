@@ -68,7 +68,7 @@ abstract class AbstractEquipment {
         if (info.target < 0) { info.target += 360; }
 
         if (!['main', 'gun', 'radar'].includes(info.type)) {
-            console.warn(`Invailed turning type ${info.type} for this equipment.`);
+            console.warn(`Invalid turning type ${info.type} for this equipment.`);
             return;
         }
 
@@ -138,7 +138,7 @@ class Tank extends AbstractEquipment {
         let type_id: string = info.type;
 
         if (!['main', 'gun', 'radar'].includes(type_id)) {
-            console.warn(`Invailed turning type ${info.type} for Tank.`);
+            console.warn(`Invalid turning type ${info.type} for Tank.`);
             return;
         }
 

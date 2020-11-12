@@ -19,7 +19,7 @@ abstract class AbstractShell {
             if (TankShell.is_valid_info(info)) { return new TankShell(info); }
             else { return new NoShell() }
         }
-        console.warn(`Invaild shell type ${info.type}.`);
+        console.warn(`Invalid shell type ${info.type}.`);
         return new NoShell();
     }
 

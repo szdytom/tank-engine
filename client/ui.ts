@@ -20,20 +20,20 @@ export default function () {
     ctx.clearRect(0, 0, Config.space.width, Config.space.height);
 
     ctx.fillStyle = 'brown';
-    const bullect_draw_size = 4;
+    const shell_draw_size = 4;
     gre.shells.forEach((this_shell) => {
         if (this_shell.level > 0) {
             ctx.fillRect(
-                Math.floor(this_shell.pos.x - bullect_draw_size / 2),
-                Math.floor(this_shell.pos.y - bullect_draw_size / 2),
-                bullect_draw_size,
-                bullect_draw_size);
+                Math.floor(this_shell.pos.x - shell_draw_size / 2),
+                Math.floor(this_shell.pos.y - shell_draw_size / 2),
+                shell_draw_size,
+                shell_draw_size);
         } else {
             ctx.strokeRect(
-                Math.floor(this_shell.pos.x - bullect_draw_size / 2),
-                Math.floor(this_shell.pos.y - bullect_draw_size / 2),
-                bullect_draw_size,
-                bullect_draw_size);
+                Math.floor(this_shell.pos.x - shell_draw_size / 2),
+                Math.floor(this_shell.pos.y - shell_draw_size / 2),
+                shell_draw_size,
+                shell_draw_size);
         }
     });
 
