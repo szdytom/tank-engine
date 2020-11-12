@@ -19,17 +19,18 @@ export default function () {
 
     ctx.clearRect(0, 0, Config.space.width, Config.space.height);
 
-    ctx.fillStyle = 'brown';
     const bullect_draw_size = 4;
     gre.shells.forEach((this_shell) => {
-        if (this_shell.level > 0) {
+        if (this_shell.type === 'TankShell') {
+            ctx.fillStyle = 'brown';
             ctx.fillRect(
                 Math.floor(this_shell.pos.x - bullect_draw_size / 2),
                 Math.floor(this_shell.pos.y - bullect_draw_size / 2),
                 bullect_draw_size,
                 bullect_draw_size);
-        } else {
-            ctx.strokeRect(
+        } else if (this_shell.type === 'AntiTankMineShell') {
+            ctx.fillStyle = 'blue';
+            ctx.fillRect(
                 Math.floor(this_shell.pos.x - bullect_draw_size / 2),
                 Math.floor(this_shell.pos.y - bullect_draw_size / 2),
                 bullect_draw_size,

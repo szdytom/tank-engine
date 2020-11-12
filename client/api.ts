@@ -69,14 +69,17 @@ class EquipmentController {
         return this_equipment.time_to_fire <= 0;
     }
 
-    fire(level: number): void {
+    fire(type: string, data: any): void {
+        if (!['TankShell', 'AntiTankMineShell'].includes(type)) {
+            vt.warn(`Unknow shell type ${type}.`);
+            return;
+        }
+
         let this_equipment = gre.get_equipment(this.equipment_id);
         this_equipment.time_to_fire = Infinity;
         gre.socket.emit('fire', {
-            type: 'TankShell',
-            data: {
-                level: level,
-            },
+            type: type,
+            data: data,
         });
     }
 
@@ -187,7 +190,17 @@ function update_equipments() {
     if (ec) { ec._tick_update(); }
 }
 
+function export_debug_ec() {
+    Object.defineProperty(window, Symbol('ec'), {
+        get(): EquipmentController {
+            return ec;
+        },
+    });
+}
+
 function start_code(parsed_code: Function, load_control_code: Promise<void>) {
+    export_debug_ec();
+
     let room_id: number = parseInt($('#room-id').val().toString());
     let equipment_type: string = <string>$('#equipment-type').val();
 
@@ -202,19 +215,7 @@ function start_code(parsed_code: Function, load_control_code: Promise<void>) {
     });
 }
 
-function set_up_control() {
-    let set_disable = (element: JQuery<HTMLElement>) => {
-        element.attr('disabled', 'true');
-        setTimeout(() => { element.removeAttr('disabled'); }, 5000);
-    }
-
-    $('#ctr-tk-fire').on('click', () => { ec.fire(2); set_disable($('#ctr-tk-fire')); });
-    $('#ctr-tk-move').on('click', () => { ec.move(); set_disable($('#ctr-tk-move')); });
-    $('#ctr-tk-stop').on('click', () => { ec.stop(); set_disable($('#ctr-tk-stop')); });
-}
-
 export {
     start_code,
     update_equipments,
-    set_up_control,
 };

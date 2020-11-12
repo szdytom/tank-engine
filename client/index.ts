@@ -1,7 +1,7 @@
 import $ = require('jquery');
 import io = require('socket.io-client');
 import Config from '../shared/config';
-import { set_up_control, start_code, update_equipments } from './api';
+import { start_code, update_equipments } from './api';
 import game_runtime_info from './global';
 import ui from './ui';
 import vt from './vt';
@@ -98,8 +98,6 @@ function on_stop() {
 }
 
 $(function () {
-	console.log('Init');
-
 	$('#run-control').css('display', 'none');
 
 	$('#start-button').on('click', start);
@@ -108,7 +106,6 @@ $(function () {
 	$('#stop-button').attr('disabled', 'true');
 
 	$('#virtual-console').val('');
-	set_up_control();
 
-	vt.info('Tank Engine Client (V2.0a4) loaded.');
+	vt.info('Tank Engine Client (V2.0a5) loaded.');
 });
