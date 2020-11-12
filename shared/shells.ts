@@ -55,7 +55,9 @@ abstract class AbstractShell {
     }
 
     check_hit(equipments: AbstractEquipment[]): boolean {
+        let result = false;
         equipments.forEach((target_tank: AbstractEquipment) => {
+            if (result) { return; }
             if (this.source.id === target_tank.id) { return; }
             if (target_tank.blood <= 0) { return; }
 
@@ -64,11 +66,12 @@ abstract class AbstractShell {
                 this.source.blood += Math.min(this.get_damage(), target_tank.blood) / 4;
                 target_tank.blood -= this.get_damage();
 
-                return true;
+                result = true;
+                return;
             }
         });
-
-        return false;
+        
+        return result;
     }
 
 

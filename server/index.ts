@@ -107,9 +107,10 @@ setInterval((): void => {
     rooms.forEach((this_room: RoomInfo): void => {
         let equipment_id_map = new Object();
 
-        this_room.shells.forEach((this_shell: AbstractShell, i: number, array: AbstractShell[]): void => {
+        this_room.shells.forEach((this_shell: AbstractShell, i: number): void => {
             if (this_shell.update((): boolean => { return this_shell.check_hit(this_room.equipments); })) {
-                delete array[i];
+                delete this_room.shells[i];
+                console.log(`Shell ${i} has been deleted`);
                 return;
             }
         });
