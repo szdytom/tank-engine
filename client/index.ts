@@ -109,7 +109,6 @@ function stop() {
 
 function on_stop() {
 	$('#stop-button').attr('disabled', 'true');
-	$('#code').css('display', 'inline');
 }
 
 $(function () {
@@ -122,5 +121,5 @@ $(function () {
 
 	$('#virtual-console').val('');
 
-	vt.info('Tank Engine Client (V2.0b6) loaded.');
+	vt.info('Tank Engine Client (V2.0rc7) loaded.');
 });

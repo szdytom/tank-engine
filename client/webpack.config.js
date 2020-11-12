@@ -6,5 +6,5 @@ module.exports = {
         path: path.join(__dirname, 'dist'),
         filename: 'entry.js'
     },
-    mode: "development",
+    // mode: "development",
 };

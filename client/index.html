@@ -24,21 +24,28 @@
             </div>
 
             <textarea id="virtual-console" readonly></textarea>
-            <input id="room-id" type="number" min="0" max="10000" placeholder="Room ID here..." value="0"
-                autocomplete="off" required />
-            <select id="equipment-type" required>
-                <option value="Tank" selected>Tank</option>
-            </select>
 
-            <button>
-                <label id="ctr-code-file-button" for="ctr-code-file">Choose Your Code</label>
-            </button>
-            <input type="file" id="ctr-code-file" />
+            <div id="type-select">
+                <input id="room-id" type="number" min="0" max="10000" placeholder="Room ID here..." value="0"
+                    autocomplete="off" required />
+                <select id="equipment-type" required>
+                    <option value="Tank" selected>Tank</option>
+                </select>
+            </div>
 
-            <input type="url" id="ctr-code-url" placeholder="Paste your code URL here..." />
+            <div id="code-file">
+                <button>
+                    <label id="ctr-code-file-button" for="ctr-code-file">Choose Your Code</label>
+                </button>
+                <input type="file" id="ctr-code-file" />
+            </div>
 
-            <button class="bottom_button" id="start-button">Start</button>
-            <button class="bottom_button" id="stop-button">Resign</button>
+            <div>
+                <input type="url" id="ctr-code-url" placeholder="Paste your code URL here..." />
+            </div>
+
+            <button class="bottom-button" id="start-button">Start</button>
+            <button class="bottom-button" id="stop-button">Resign</button>
         </div>
     </main>
     <div id="message"></div>
@@ -69,7 +76,6 @@
             margin-left: calc(50vw - 500px);
             width: 1000px;
             height: 800px;
-            box-shadow: 0 1px 3px rgba(50, 50, 93, .15), 0 1px 0 rgba(0, 0, 0, .02);
         }
 
         #message {
@@ -87,16 +93,7 @@
             margin-left: 10px;
         }
 
-        #stop-button {
-            float: right;
-            margin-right: 10px;
-        }
-
-        #load-from-file {
-            margin: 10px;
-        }
-
-        .bottom_button {
+        .bottom-button {
             margin-top: 10px;
         }
 
