@@ -32,19 +32,19 @@ const http = new http_server.Server(app);
 const io = new SocketIO.Server(http);
 let rooms = new Array<RoomInfo>();
 
-io.on('connect', (socket: SocketIO.Socket) => {
+io.on('connect', (socket: SocketIO.Socket): void => {
     console.log(`One client connected: ${socket.id} @ ${socket.handshake.address}`);
 
     let this_equipment: AbstractEquipment = null;
     let room_id: number = null;
 
-    socket.on('disconnect', () => {
+    socket.on('disconnect', (): void => {
         console.log(`Client ${socket.id} disconnected.`);
         if (is_bad_equipment(this_equipment)) { return; }
         this_equipment.blood = -Infinity;
     });
 
-    socket.on('join-space', (info: { room_id: number, equipment_type: string }) => {
+    socket.on('join-space', (info: { room_id: number, equipment_type: string }): void => {
         if (typeof info.room_id !== 'number' || info.room_id > Config.max_rooms || info.room_id < 0) {
             console.warn(`Invailed Argument of room_id='${room_id}'.`);
             return;
@@ -66,15 +66,16 @@ io.on('connect', (socket: SocketIO.Socket) => {
         }
     });
 
-    socket.on('turn', (info: TurningInfo) => {
+    socket.on('turn', (info: TurningInfo): void => {
         if (is_bad_equipment(this_equipment)) { return; }
         this_equipment.turn_to(info);
     });
 
-    socket.on('fire', (info: FireInfo) => {
+    socket.on('fire', (info: FireInfo): void => {
         if (is_bad_equipment(this_equipment)) { return; }
         if (!this_equipment.can_fire()) {
             this_equipment.blood -= this_equipment.get_fire_too_much_damage();
+            console.log('Fire too much.');
             return;
         }
 
@@ -86,34 +87,34 @@ io.on('connect', (socket: SocketIO.Socket) => {
         this_equipment.time_to_fire += this_shell.get_heat();
     });
 
-    socket.on('move', (state: boolean) => {
+    socket.on('move', (state: boolean): void => {
         if (is_bad_equipment(this_equipment)) { return; }
         this_equipment.is_moving = state;
     });
 
-    socket.on('set-name', (name: string) => {
+    socket.on('set-name', (name: string): void => {
         if (is_bad_equipment(this_equipment)) { return; };
         this_equipment.set_name(name);
     });
 
-    socket.on('boardcast', (data: any) => {
+    socket.on('boardcast', (data: any): void => {
         if (is_bad_equipment(this_equipment)) { return; }
         socket.to(rooms[room_id].room_id).broadcast.emit('boardcast', data);
     });
 });
 
-setInterval(() => {
-    rooms.forEach((this_room: RoomInfo) => {
+setInterval((): void => {
+    rooms.forEach((this_room: RoomInfo): void => {
         let equipment_id_map = new Object();
 
-        this_room.shells.forEach((this_shell: AbstractShell, i: number, array: AbstractShell[]) => {
+        this_room.shells.forEach((this_shell: AbstractShell, i: number, array: AbstractShell[]): void => {
             if (this_shell.update((): boolean => { return this_shell.check_hit(this_room.equipments); })) {
                 delete array[i];
                 return;
             }
         });
 
-        this_room.equipments.forEach((this_equipemt: AbstractEquipment, i: number, array: AbstractEquipment[]) => {
+        this_room.equipments.forEach((this_equipemt: AbstractEquipment, i: number, array: AbstractEquipment[]): void => {
             if (this_equipemt.update()) {
                 console.log(`Equipment ${this_equipemt.id} was destroyed.`);
                 io.to(this_equipemt.id).emit('equipemt-destory');
@@ -134,7 +135,7 @@ setInterval(() => {
 }, Config.tick_speed);
 
 app.use('/', Express.static(path.join(__dirname, '../client')));
-app.get('/webjs', (req, res) => {
+app.get('/webjs', (req, res): void => {
     let url: string = req.query.url.toString();
     console.log(`Web JS Fetch: ${url}`);
 
@@ -144,13 +145,13 @@ app.get('/webjs', (req, res) => {
     }
 
     axios.get(url, { timeout: 10000 })
-        .then((resualt) => {
+        .then((resualt): void => {
             res.send(resualt.data);
         })
-        .catch(() => {
+        .catch((): void => {
             res.status(400).send(`Failed to get ${url}.`);
         });
 });
 
 let server_port = parseInt(process.env.PORT) | 3000;
-http.listen(server_port, () => { console.log(`Server started on port ${server_port}.`); });
+http.listen(server_port, (): void => { console.log(`Server started on port ${server_port}.`); });

@@ -48,9 +48,7 @@ abstract class AbstractShell {
         const move_splits = 4;
         for (let i = 1; i <= move_splits; i += 1) {
             this.pos.update(this.angle, this.get_speed() / move_splits);
-            if (check_hit_callback() || this.check_out_of_space()) {
-                return true;
-            }
+            if (check_hit_callback() || this.check_out_of_space()) { return true; }
         }
 
         return false;
@@ -59,14 +57,17 @@ abstract class AbstractShell {
     check_hit(equipments: AbstractEquipment[]): boolean {
         equipments.forEach((target_tank: AbstractEquipment) => {
             if (this.source.id === target_tank.id) { return; }
+            if (target_tank.blood <= 0) { return; }
 
             if (target_tank.check_hit(this.pos)) {
+                console.log(`Hit damage ${this.get_damage()}.`);
                 this.source.blood += Math.min(this.get_damage(), target_tank.blood) / 4;
                 target_tank.blood -= this.get_damage();
 
                 return true;
             }
         });
+
         return false;
     }
 
@@ -99,7 +100,7 @@ class TankShell extends AbstractShell {
     }
 
     get_heat(): number { return Config.shells.Tank.heat[this.level]; }
-    get_damage(): number { return Config.shells.Tank[this.level]; }
+    get_damage(): number { return Config.shells.Tank.damage[this.level]; }
     get_speed(): number { return Config.shells.Tank.speed; }
 }
 
