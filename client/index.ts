@@ -75,15 +75,30 @@ function start_by_code(code: string) {
 	});
 }
 
-function start() {
-	let code: string = $('#code').val().toString();
-	if (code.startsWith('http')) {
+function get_code_from_file(): Promise<string> {
+	let input = <HTMLFormElement>document.getElementById('#ctr-code-file');
+	let reader: FileReader = new FileReader();
+
+	reader.readAsText(input.files[0]);
+	return new Promise<string>((resolve) => {
+		reader.onload = function () {
+			if (reader.result) { resolve(reader.result.toString()); }
+		};
+	});
+};
+
+function start(): void {
+	let code: string = $('#ctr-code-url').val().toString();
+	if (code.length > 0) {
 		// is an URL
 		$.get('/webjs', { url: code }, (web_code: string): void => {
 			start_by_code(web_code);
 		});
 	} else {
-		start_by_code(code);
+		get_code_from_file()
+			.then((code): void => {
+				start_by_code(code);
+			});
 	}
 }
 
