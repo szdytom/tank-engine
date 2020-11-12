@@ -122,5 +122,5 @@ $(function () {
 
 	$('#virtual-console').val('');
 
-	vt.info('Tank Engine Client (V2.0a5) loaded.');
+	vt.info('Tank Engine Client (V2.0b6) loaded.');
 });

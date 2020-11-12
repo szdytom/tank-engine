@@ -1,6 +1,6 @@
 {
   "name": "tank-engine",
-  "version": "2.0.5",
+  "version": "2.0.6",
   "description": "A tank game based on code control",
   "main": "server/index.ts",
   "scripts": {
