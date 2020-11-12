@@ -48,10 +48,10 @@ abstract class AbstractEquipment {
 
     check_hit(shell_pos: Position): boolean {
         let half_size = this.get_size() / 2;
-        if (shell_pos.x >= shell_pos.x - half_size
-            && shell_pos.x <= shell_pos.x + half_size
-            && shell_pos.y >= shell_pos.y - half_size
-            && shell_pos.y <= shell_pos.y + half_size) {
+        if (shell_pos.x >= this.pos.x - half_size
+            && shell_pos.x <= this.pos.x + half_size
+            && shell_pos.y >= this.pos.y - half_size
+            && shell_pos.y <= this.pos.y + half_size) {
             return true;
         }
         return false;
