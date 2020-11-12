@@ -18,7 +18,11 @@ abstract class AbstractShell {
         if (info.type === 'TankShell') {
             if (TankShell.is_valid_info(info)) { return new TankShell(info); }
             else { return new NoShell() }
+        } else if (info.type === 'AntiTankMineShell') {
+            if (AntiTankMineShell.is_valid_info(info)) { return new AntiTankMineShell(info); }
+            else { return new NoShell() }
         }
+      
         console.warn(`Invalid shell type ${info.type}.`);
         return new NoShell();
     }
@@ -70,7 +74,7 @@ abstract class AbstractShell {
                 return;
             }
         });
-        
+
         return result;
     }
 
@@ -105,6 +109,29 @@ class TankShell extends AbstractShell {
     get_heat(): number { return Config.shells.Tank.heat[this.level]; }
     get_damage(): number { return Config.shells.Tank.damage[this.level]; }
     get_speed(): number { return Config.shells.Tank.speed; }
+}
+
+class AntiTankMineShell extends AbstractShell {
+    static is_valid_info(_info: FireInfo): boolean { return true; }
+
+    private time_to_live: number
+
+    constructor(info: FireInfo) {
+        super('AntiTankMineShell', info);
+
+        this.time_to_live = Config.shells.AntiTankMine.ttl;
+    }
+
+    get_heat(): number { return Config.shells.AntiTankMine.damage; }
+    get_damage(): number { return Config.shells.AntiTankMine.heat; }
+    get_speed(): number { return 0; }
+
+    update(check_hit_callback: () => boolean): boolean {
+        if (check_hit_callback()) { return true; }
+        if (this.time_to_live <= 0) { return true; }
+        this.time_to_live -= 1;
+        return false;
+    }
 }
 
 class NoShell extends AbstractShell {
