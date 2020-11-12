@@ -11,6 +11,11 @@ const Config = {
             damage: [1, 20, 25, 75, 98.75],
             heat: [1, 16, 19, 50, 59],
         },
+        AntiTankMine: {
+            damage: 85,
+            ttl: 1000,
+            heat: 35,
+        },
     },
     equipments: {
         Tanks: {

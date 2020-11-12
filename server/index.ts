@@ -46,7 +46,7 @@ io.on('connect', (socket: SocketIO.Socket): void => {
 
     socket.on('join-space', (info: { room_id: number, equipment_type: string }): void => {
         if (typeof info.room_id !== 'number' || info.room_id > Config.max_rooms || info.room_id < 0) {
-            console.warn(`Invailed Argument of room_id='${room_id}'.`);
+            console.warn(`Invalid Argument of room_id='${room_id}'.`);
             return;
         }
         room_id = Math.floor(info.room_id);
@@ -62,7 +62,7 @@ io.on('connect', (socket: SocketIO.Socket): void => {
             this_equipment = new Tank(socket.id);
             rooms[info.room_id].equipments.push(this_equipment);
         } else {
-            console.warn(`Unknow equipment type ${info.equipment_type}.`);
+            console.warn(`Unknown equipment type ${info.equipment_type}.`);
         }
     });
 
@@ -97,9 +97,9 @@ io.on('connect', (socket: SocketIO.Socket): void => {
         this_equipment.set_name(name);
     });
 
-    socket.on('boardcast', (data: any): void => {
+    socket.on('broadcast', (data: any): void => {
         if (is_bad_equipment(this_equipment)) { return; }
-        socket.to(rooms[room_id].room_id).broadcast.emit('boardcast', data);
+        socket.to(rooms[room_id].room_id).broadcast.emit('broadcast', data);
     });
 });
 
@@ -115,16 +115,16 @@ setInterval((): void => {
             }
         });
 
-        this_room.equipments.forEach((this_equipemt: AbstractEquipment, i: number, array: AbstractEquipment[]): void => {
-            if (this_equipemt.update()) {
-                console.log(`Equipment ${this_equipemt.id} was destroyed.`);
-                io.to(this_equipemt.id).emit('equipemt-destory');
-                this_equipemt.blood = -Infinity;
+        this_room.equipments.forEach((this_equipment: AbstractEquipment, i: number, array: AbstractEquipment[]): void => {
+            if (this_equipment.update()) {
+                console.log(`Equipment ${this_equipment.id} was destroyed.`);
+                io.to(this_equipment.id).emit('equipment-destroy');
+                this_equipment.blood = -Infinity;
                 delete array[i];
                 return;
             }
 
-            equipment_id_map[this_equipemt.id] = i;
+            equipment_id_map[this_equipment.id] = i;
         });
 
         io.to(this_room.room_id).emit('update', {
@@ -146,8 +146,8 @@ app.get('/webjs', (req, res): void => {
     }
 
     axios.get(url, { timeout: 10000 })
-        .then((resualt): void => {
-            res.send(resualt.data);
+        .then((result): void => {
+            res.send(result.data);
         })
         .catch((): void => {
             res.status(400).send(`Failed to get ${url}.`);
