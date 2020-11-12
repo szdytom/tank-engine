@@ -76,7 +76,7 @@ function start_by_code(code: string) {
 }
 
 function get_code_from_file(): Promise<string> {
-	let input = <HTMLFormElement>document.getElementById('#ctr-code-file');
+	let input = <HTMLFormElement>document.getElementById('ctr-code-file');
 	let reader: FileReader = new FileReader();
 
 	reader.readAsText(input.files[0]);
@@ -97,6 +97,7 @@ function start(): void {
 	} else {
 		get_code_from_file()
 			.then((code): void => {
+				console.log(code);
 				start_by_code(code);
 			});
 	}
