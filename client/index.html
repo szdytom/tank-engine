@@ -24,21 +24,38 @@
             </div>
 
             <textarea id="virtual-console" readonly></textarea>
-            <input id="room-id" type="number" min="0" max="10000" placeholder="Room ID here..." value="0"
-                autocomplete="off" required />
-            <select id="equipment-type" required>
-                <option value="Tank" selected>Tank</option>
-            </select>
-            <textarea id="code" autocomplete="off" spellcheck="false"
-                placeholder="Paste your code or code URL here..."></textarea>
 
-            <button class="bottom_button" id="start-button">Start</button>
-            <button class="bottom_button" id="stop-button">Resign</button>
+            <div id="type-select">
+                <input id="room-id" type="number" min="0" max="10000" placeholder="Room ID here..." value="0"
+                    autocomplete="off" required />
+                <select id="equipment-type" required>
+                    <option value="Tank" selected>Tank</option>
+                </select>
+            </div>
+
+            <div id="code-file">
+                <button>
+                    <label id="ctr-code-file-button" for="ctr-code-file">Choose Your Code</label>
+                </button>
+                <input type="file" id="ctr-code-file" />
+            </div>
+
+            <div>
+                <input type="url" id="ctr-code-url" placeholder="Paste your code URL here..." />
+            </div>
+
+            <button class="bottom-button" id="start-button">Start</button>
+            <button class="bottom-button" id="stop-button">Resign</button>
         </div>
     </main>
     <div id="message"></div>
 
     <style>
+        #ctr-code-file {
+            opacity: 0;
+            width: 0;
+        }
+
         body {
             background-color: #f9f9f9;
             margin: 0;
@@ -59,7 +76,6 @@
             margin-left: calc(50vw - 500px);
             width: 1000px;
             height: 800px;
-            box-shadow: 0 1px 3px rgba(50, 50, 93, .15), 0 1px 0 rgba(0, 0, 0, .02);
         }
 
         #message {
@@ -72,28 +88,12 @@
             padding-left: calc(50vw - 505px);
         }
 
-        #code {
-            font-family: monospace;
-            font-size: larger;
-            height: auto;
-            height: 100%;
-            width: 100%;
-            border: none;
-            resize: none;
-            box-shadow: 0 1px 3px rgba(50, 50, 93, .15), 0 1px 0 rgba(0, 0, 0, .02);
-        }
-
         #start-button {
             float: left;
             margin-left: 10px;
         }
 
-        #stop-button {
-            float: right;
-            margin-right: 10px;
-        }
-
-        .bottom_button {
+        .bottom-button {
             margin-top: 10px;
         }
 

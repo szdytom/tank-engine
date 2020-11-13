@@ -19,7 +19,7 @@ export default function () {
 
     ctx.clearRect(0, 0, Config.space.width, Config.space.height);
 
-    const bullect_draw_size = 4;
+    const shell_draw_size = 4;
     gre.shells.forEach((this_shell) => {
         if (this_shell.type === 'TankShell') {
             ctx.fillStyle = 'brown';
