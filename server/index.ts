@@ -155,3 +155,4 @@ app.get('/webjs', (req, res): void => {
 
 let server_port = parseInt(process.env.PORT) | 3000;
 http.listen(server_port, (): void => { console.log(`Server started on port ${server_port}.`); });
+
