@@ -7,3 +7,6 @@ node_modules/
 # built
 dist/
 build/
+
+src/*.js
+shared/*.js
