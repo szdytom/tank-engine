@@ -72,7 +72,7 @@ export class Tank {
         if (this.can_fire()) {
             return true;
         }
-        this.blood -= config.tank.blood;
+        this.blood -= config.tank.fire_too_much_damage;
         return false;
     }
 
@@ -104,6 +104,8 @@ export class Tank {
             radar_angle: this.radar_angle,
             id: this.id,
             owner_id: this.owner_id,
+            heat: this.heat,
+            blood: this.blood,
         };
     }
 

@@ -1,6 +1,5 @@
 export default {
-    tick_speed: 50, // ms
-    sync_speed: 4, // sync per tick
+    tick_speed: 40, // ms
     tank: {
         speed: 5,
         blood: 100,
@@ -8,8 +7,7 @@ export default {
         size: 50, // 50x50
         
         crash_damage: 1, // crash wall
-        fire_too_much_damage_rate: 0.1,
-        fire_too_much_damage_min: 5,
+        fire_too_much_damage: 15,
 
         turn_speed: {
             main: 14.8, // degree per tick,

@@ -2,7 +2,10 @@ let control_type = 'connect';
 
 let socket = null;
 let loaded_code;
-var game_state;
+var game_state = {
+    tanks: [],
+    shells: [],
+};
 
 function connect() {
     document.getElementById('control').innerHTML = 'start';
@@ -25,7 +28,8 @@ function connect() {
     });
     
     socket.on('sync-game', data => {
-        game_state = data;
+        game_state.tanks = data.t;
+        game_state.shells = data.s;
         draw();
         tank_controller.update();
     });

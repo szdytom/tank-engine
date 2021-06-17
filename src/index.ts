@@ -15,13 +15,13 @@ let tanks: Tank[] = [];
 
 function pack_data() {
     return {
-        t: tanks.map(x => x.pack()),
+        t: tanks,
         s: shells,
     };
 }
 
 io.on('connection', (socket) => {
-    console.log(`Client Connect: ${socket.id} @ ${socket.handshake.address}.`);
+    console.log(`Client connect: ${socket.id} @ ${socket.handshake.address}.`);
 
     let tank: Tank = null;
 
@@ -36,8 +36,11 @@ io.on('connection', (socket) => {
     });
 
     socket.on('disconnect', () => {
-        tank.kill();
-        tank = null;
+        console.log(`Client disconnect: ${socket.id}.`);
+        if (tank != null) {
+            tank.kill();
+            tank = null;
+        }
     });
 
     socket.on('move', (state: boolean) => {
@@ -69,27 +72,34 @@ io.on('connection', (socket) => {
 });
 
 setInterval(() => {
-    for (let i in shells) {
-        shells[i].update(tanks);
-        if (!shells[i].is_alive()) {
-            delete shells[i];
-        }
+    for (let e of shells) {
+        if (e == null) { continue; }
+        e.update(tanks);
     }
 
     for (let t of tanks) {
-        t.update();
-    }
-
-    for (let i in tanks) {
-        if (!tanks[i].is_alive()) {
-            delete tanks[i];
+        if (t != null) {
+            t.update();
         }
     }
-}, config.tick_speed);
 
-setInterval(() => {
+    let next_tk: Tank[] = [];
+    for (let t of tanks) {
+        if (t.is_alive()) {
+            next_tk.push(t);
+        }
+    }
+    tanks = next_tk;
+
+    let next_shells: Shell[] = [];
+    for (let e of shells) {
+        if (e.is_alive()) {
+            next_shells.push(e);
+        }
+    }
+    shells = next_shells;
     io.emit('sync-game', pack_data());
-}, config.tick_speed * config.sync_speed);
+}, config.tick_speed);
 
 app.use('/', Express.static(path.join(__dirname, '../client')));
 app.use('/shared', Express.static(path.join(__dirname, '../shared')));

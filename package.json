@@ -2,10 +2,7 @@
   "name": "tank-engine",
   "version": "3.0.0",
   "description": "A code controled tank fight game.",
-  "main": "server/index.ts",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
+  "main": "src/index.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/LighteningZero/tank-engine.git"

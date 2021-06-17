@@ -31,6 +31,8 @@ export class Shell {
         ];
 
         for (let t of tanks) {
+            if (t == null) { continue; }
+
             if (t.id == this.owner_id) {
                 continue;
             }

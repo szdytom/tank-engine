@@ -1,6 +1,5 @@
 var config = {
     tick_speed: 50, // ms
-    sync_speed: 4, // sync per tick
     tank: {
         speed: 5,
         blood: 100,

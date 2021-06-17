@@ -17,6 +17,8 @@ function vector_add(a: number[], b: number[]): number[] {
 };
 
 export function rect_xy(cx: number, cy: number, angle: number, size: number): number[][] {
+    size /= 2;
+
     function rotate(x: number, y: number) {
         const c = Math.cos(covert_degree(angle));
         const s = Math.sin(covert_degree(angle));
@@ -28,8 +30,8 @@ export function rect_xy(cx: number, cy: number, angle: number, size: number): nu
     return [
         vector_add(rotate(size, size), [cx, cy]),
         vector_add(rotate(-size, size), [cx, cy]),
-        vector_add(rotate(size, -size), [cx, cy]),
         vector_add(rotate(-size, -size), [cx, cy]),
+        vector_add(rotate(size, -size), [cx, cy]),
     ];
 };
 
